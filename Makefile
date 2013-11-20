@@ -17,6 +17,7 @@ MAKE_ENV += INSTALL_INCLUDE_DIR=$(INSTALL_INCLUDE_DIR)
 
 all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C Lambda $(MAKE_ENV)
+	make -C mixin $(MAKE_ENV)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
