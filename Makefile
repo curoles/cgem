@@ -16,9 +16,11 @@ MAKE_ENV += INSTALL_DIR=$(INSTALL_DIR_PATH) BUILD_DIR=$(BUILD_DIR_PATH)
 MAKE_ENV += INSTALL_INCLUDE_DIR=$(INSTALL_INCLUDE_DIR)
 
 all: $(BUILD_DIR) $(INSTALL_DIR)
+	cp helpers/*.h $(INSTALL_INCLUDE_DIR)/.
 	make -C Lambda $(MAKE_ENV)
 	make -C mixin  $(MAKE_ENV)
 	make -C File   $(MAKE_ENV)
+	make -C StaticString   $(MAKE_ENV)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

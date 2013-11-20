@@ -42,8 +42,8 @@ public:
         file_name = "";
     }
 
-    bool open(const char* filename, const char* mode) {
-        file = ::fopen (filename, mode);
+    bool open(const std::string& filename, const char* mode) {
+        file = ::fopen (filename.c_str(), mode);
         if (file)
             this->file_name = filename;
 
@@ -77,7 +77,7 @@ public:
     }
 
     static
-    bool open(const char* filename, const char* mode, std::function<bool(File&)> act) {
+    bool open(const std::string& filename, const char* mode, std::function<bool(File&)> act) {
         File file;
         auto opened = file.open (filename, mode);
         if (not opened)
@@ -87,23 +87,23 @@ public:
     }
 
     static
-    bool touch(const char* filename) {
+    bool touch(const std::string& filename) {
         File file;
         return File().open (filename, "w");
     }
 
     static
-    bool is_exist(const char* filename) {
+    bool is_exist(const std::string& filename) {
         return File().open (filename, "r");
     }
 
     static
-    bool remove(const char* filename) {
-        return 0 == ::remove (filename);
+    bool remove(const std::string& filename) {
+        return 0 == ::remove (filename.c_str());
     }
 
     static
-    std::string read(const char* filename) {
+    std::string read(const std::string& filename) {
         std::string text;
         File::open (filename, "r", [&text](File& f)->bool{
             std::string line;
