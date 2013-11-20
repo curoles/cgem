@@ -9,15 +9,16 @@ INSTALL_DIR_PATH = $(abspath $(INSTALL_DIR))
 INSTALL_INCLUDE_DIR := $(INSTALL_DIR_PATH)/include/cgem
 
 CXX := /tools/local/gcc-4.7.2/bin/g++-4.7.2
-CFLAGS := -I$(INSTALL_DIR_PATH)/include
+CFLAGS := -I$(INSTALL_DIR_PATH)/include -std=c++11
 
-MAKE_ENV := CXX=$(CXX) CFLAGS=$(CFLAGS)
+MAKE_ENV := CXX=$(CXX) CFLAGS="$(CFLAGS)"
 MAKE_ENV += INSTALL_DIR=$(INSTALL_DIR_PATH) BUILD_DIR=$(BUILD_DIR_PATH)
 MAKE_ENV += INSTALL_INCLUDE_DIR=$(INSTALL_INCLUDE_DIR)
 
 all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C Lambda $(MAKE_ENV)
-	make -C mixin $(MAKE_ENV)
+	make -C mixin  $(MAKE_ENV)
+	make -C File   $(MAKE_ENV)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
