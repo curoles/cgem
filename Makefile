@@ -32,6 +32,7 @@ all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C File   $(MAKE_ENV)
 	make -C StaticString   $(MAKE_ENV)
 	make -C StringBuf      $(MAKE_ENV)
+	make -C Backtrace      $(MAKE_ENV)
 	$(AR) -t -v $(CGEM_LIB)
 	$(AR) -t -v $(XGEM_LIB)
 
