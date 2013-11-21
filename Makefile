@@ -33,6 +33,7 @@ all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C StaticString   $(MAKE_ENV)
 	make -C StringBuf      $(MAKE_ENV)
 	make -C Backtrace      $(MAKE_ENV)
+	make -C C/Vector       $(MAKE_ENV)
 	$(AR) -t -v $(CGEM_LIB)
 	$(AR) -t -v $(XGEM_LIB)
 
@@ -44,6 +45,7 @@ $(BUILD_DIR):
 $(INSTALL_DIR):
 	mkdir -p $(INSTALL_DIR)
 	mkdir -p $(INSTALL_INCLUDE_DIR)
+	mkdir -p $(INSTALL_INCLUDE_DIR)/C
 	mkdir -p $(INSTALL_LIB_DIR)
 
 clean:
