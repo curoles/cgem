@@ -34,6 +34,7 @@ all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C StringBuf      $(MAKE_ENV)
 	make -C Backtrace      $(MAKE_ENV)
 	make -C C/Vector       $(MAKE_ENV)
+	make -C C/Trie         $(MAKE_ENV)
 	$(AR) -t -v $(CGEM_LIB)
 	$(AR) -t -v $(XGEM_LIB)
 
