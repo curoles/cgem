@@ -1,6 +1,12 @@
 BUILD_DIR ?= ../build
 INSTALL_DIR ?= ../install
 
+CXX := g++ #/tools/local/gcc-4.7.2/bin/g++-4.7.2
+CC  := gcc #/tools/local/gcc-4.7.2/bin/gcc-4.7.2
+CXXFLAGS := -std=c++0x #-std=c++11
+
+-include config.mk
+
 #$(realpath $(lastword $(MAKEFILE_LIST)))
 
 BUILD_DIR_PATH = $(abspath $(BUILD_DIR))
@@ -12,10 +18,8 @@ INSTALL_LIB_DIR := $(INSTALL_DIR_PATH)/lib
 CGEM_LIB := $(INSTALL_LIB_DIR)/libcgem.a
 XGEM_LIB := $(INSTALL_LIB_DIR)/libxgem.a
 
-CXX := g++ #/tools/local/gcc-4.7.2/bin/g++-4.7.2
-CC  := gcc #/tools/local/gcc-4.7.2/bin/gcc-4.7.2
-CFLAGS := -I$(INSTALL_DIR_PATH)/include
-CXXFLAGS := -std=c++0x #-std=c++11
+CFLAGS += -I$(INSTALL_DIR_PATH)/include
+
 
 AR := ar
 
@@ -35,6 +39,7 @@ all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C Backtrace      $(MAKE_ENV)
 	make -C C/Vector       $(MAKE_ENV)
 	make -C C/Trie         $(MAKE_ENV)
+	make -C JRS            $(MAKE_ENV)
 	$(AR) -t -v $(CGEM_LIB)
 	$(AR) -t -v $(XGEM_LIB)
 
