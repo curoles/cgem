@@ -38,7 +38,7 @@ typedef struct vector_t
 } vector_t;
 
 /// Number of elements to add on resize.
-static const vector_chunk_size = 10;
+static const size_t vector_chunk_size = 10;
 
 /// Make vector bigger, allocate more elements.
 static inline void vector_resize(vector_t* v)
@@ -60,6 +60,7 @@ static inline void vector_resize(vector_t* v)
 static inline void vector_init(vector_t* v, size_t element_size)
 {
     assert(v != NULL);
+    assert(element_size > 0);
 
     v->el_sz = element_size;
     v->space = v->size = 0;
@@ -96,17 +97,17 @@ static inline void vector_unit_test()
 {
     size_t i = 0;
     vector_t v;
-    uint32_t* alias;
+    uint32_t** alias;
 
     vector_init(&v, sizeof(uint32_t));
-    alias = v.element;
+    alias = &(v.element);
 
     for (i = 0; i < 22; ++i){
         vector_push_back(uint32_t, v, i);
     }
 
     for (i = 0; i < v.size; ++i){
-        printf("%3u %3u\n", vector_at(uint32_t, v, i), alias[i]);
+        printf("%3u %3u\n", vector_at(uint32_t, v, i), (*alias)[i]);
         assert(i == vector_at(uint32_t, v, i));
     }
 

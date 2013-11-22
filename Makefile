@@ -12,10 +12,10 @@ INSTALL_LIB_DIR := $(INSTALL_DIR_PATH)/lib
 CGEM_LIB := $(INSTALL_LIB_DIR)/libcgem.a
 XGEM_LIB := $(INSTALL_LIB_DIR)/libxgem.a
 
-CXX := /tools/local/gcc-4.7.2/bin/g++-4.7.2
-CC  := /tools/local/gcc-4.7.2/bin/gcc-4.7.2
+CXX := g++ #/tools/local/gcc-4.7.2/bin/g++-4.7.2
+CC  := gcc #/tools/local/gcc-4.7.2/bin/gcc-4.7.2
 CFLAGS := -I$(INSTALL_DIR_PATH)/include
-CXXFLAGS := -std=c++11
+CXXFLAGS := -std=c++0x #-std=c++11
 
 AR := ar
 
