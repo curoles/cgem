@@ -3,10 +3,11 @@
  * @author    Igor Lesik 2011
  * @copyright (c) 2011 Igor Lesik
  *
- * Sequential records organized in a journal. Other than Records there
- * are Markers in the Journal. Markers are placed in some distance
- * from each other and make up an ordered list. Markers serve to
- * do fast rewind.
+ * JRS helps to orginize sequential records inside a file, making it a journal.
+ * JRS has only 2 types of records: Record and Marker.
+ * Markers are placed in some distance from each other
+ * and make up an ordered list. Markers serve to
+ * do fast rewinding.
  *
  * Journal structure:
  * [M][R][R][R]...[R][M][R]...[R][M][R]...
@@ -35,6 +36,7 @@ const magic_t MAGIC_R = 0x0abcdef0;
  */
 struct Record
 {
+    /// Record position in file
     File::pos_t file_pos;
 
 #pragma pack(push,1)
@@ -57,20 +59,25 @@ struct Record
 
     ~Record();
 
+    /// Size of Record
     inline size_t size() const {
         return hdr.size + sizeof (hdr);
     }
-    inline File::pos_t nextRecord() const {
+
+    /// Record position plus size of the record give pointer to next record
+    inline File::pos_t next_record() const {
         return file_pos + (File::pos_t)size ();
     }
 
+    /// Read record from file
     bool read(File& file, File::pos_t pos);
 
+    /// Write record to file
     bool write(File& file);
 
-    private:
-    bool readHdr(File& file, File::pos_t pos);
-    bool readBody(File& file);
+private:
+    bool read_hdr(File& file, File::pos_t pos);
+    bool read_body(File& file);
 };
 
 struct Marker
@@ -115,18 +122,20 @@ class Journal
         m_file.close ();
     }
 
-    bool isOpen() {
-        return m_file.isOpen ();
-    }
-    bool eof() {
-        return m_file.eof ();
+    bool is_open() {
+        return m_file.is_open ();
     }
 
-    long int getCurrentFilePosition() {
-        return m_file.currentPosition ();
+    bool is_eof() {
+        return m_file.is_eof ();
+    }
+
+    long int get_current_file_position() {
+        return m_file.current_position ();
     }
     void rewindBeginning() {
-        fflush (m_file);rewind (m_file);
+        fflush (m_file);
+        rewind (m_file);
     }
 
     bool addRecord(

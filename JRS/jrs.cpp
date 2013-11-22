@@ -3,7 +3,6 @@
  * @author    Igor Lesik 2011
  * @copyright (c) 2011 Igor Lesik
  *
- * Sequential records organized in journal.
  */
 #include "jrs.h"
 

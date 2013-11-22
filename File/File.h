@@ -33,6 +33,10 @@ public:
         File::close ();
     }
 
+    operator FILE* () {
+        return file;
+    }
+
     void close() {
         if (file != nullptr)
         {
@@ -52,6 +56,14 @@ public:
 
     bool is_open() const {
         return file != nullptr;
+    }
+
+    bool is_eof() {
+        return ::feof (file);
+    }
+
+    long int current_position() {
+        return ::ftell (file);
     }
 
     bool write(const std::string& str)
@@ -128,22 +140,12 @@ public:
 
 
 
-    bool eof() {
-        return feof (file);
-    }
 
     std::string getName(void) {
         return m_fileName;
     };
 
-    operator FILE* ()
-    {
-        return file;
-    }
 
-    long int currentPosition() {
-        return ftell (file);
-    }
 
     void rewind() {
         ::rewind (file);
