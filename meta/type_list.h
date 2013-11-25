@@ -26,7 +26,11 @@ int main()
     typedef std::conditional<true, int, double>::type Type1;
     typedef std::conditional<false, int, double>::type Type2;
     typedef std::conditional<sizeof(int) >= sizeof(double), int, double>::type Type3;
- 
+
+    static_assert( std::is_same<Type1/*decltype(i)*/, int>::value, "!int" );
+    Type1 i;
+    static_assert( std::is_same<decltype(i), int>::value, "!int" );
+
     std::cout << typeid(Type1).name() << '\n';
     std::cout << typeid(Type2).name() << '\n';
     std::cout << typeid(Type3).name() << '\n';
