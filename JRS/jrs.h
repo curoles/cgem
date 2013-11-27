@@ -54,8 +54,8 @@ struct Record
     size_t body_alloc_size;
 
     Record();
-    Record(const Record& x);
-    Record& operator= (const Record& x);
+    //Record(const Record& x);
+    //Record& operator= (const Record& x);
 
     ~Record();
 

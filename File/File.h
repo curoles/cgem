@@ -161,18 +161,15 @@ public:
 #endif
 };
 
-#if 0
+
 template <class T>
-bool fread_val(File& file,
-    T& val)
+bool fread_val(File& file, T& val)
 {
     return fread ((void*)&val, sizeof (val), 1, file);
 }
 
 template <class T>
-bool fread_val(File& file,
-    File::pos_t pos,
-    T& val)
+bool fread_val(File& file, File::pos_t pos, T& val)
 {
     if ((pos != ftell (file)) && (0 != fseek (file, pos, SEEK_SET)))
     {
@@ -183,11 +180,10 @@ bool fread_val(File& file,
 }
 
 template <class T>
-bool fwrite_val(File& file,
-    T& val)
+bool fwrite_val(File& file, T& val)
 {
     return fwrite ((void*)&val, sizeof (val), 1, file);
 }
-#endif
+
 
 #endif

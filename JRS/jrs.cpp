@@ -13,13 +13,14 @@ namespace jrs
 
 Record::Record() :
     file_pos (File::NPOS),
-    body (NULL),
+    hdr {0, 0, 0, 0, 0},
+    body (nullptr),
     body_alloc_size (0)
 {
-    hdr.size = 0;
+    //hdr.size = 0;
 }
 
-
+#if 0
 Record::Record(const Record& x) :
     file_pos (x.file_pos),
     hdr (x.hdr),
@@ -49,6 +50,7 @@ Record& Record::operator= (const Record& x)
 
     return *this;
 }
+#endif
 
 Record::
 ~Record()
@@ -60,19 +62,20 @@ Record::
 }
 
 bool
-Record::readHdr(File& file,
+Record::read_hdr(
+    File& file,
     File::pos_t pos)
 {
     file_pos = pos;
 
-    if (!file.isOpen ())
+    if (!file.is_open ())
         return false;
 
     return fread_val (file, pos, hdr);
 }
 
 bool
-Record::readBody(File& file)
+Record::read_body(File& file)
 {
     if (!body || hdr.size > body_alloc_size)
     {
@@ -88,12 +91,11 @@ Record::readBody(File& file)
 }
 
 bool
-Record::read(File& file,
-    File::pos_t pos)
+Record::read(File& file, File::pos_t pos)
 {
     //debugJrsRecord(cosim::Dbg::JOURNAL+11, "read pos %"PRId64", fd=%lx", pos, &file );
 
-    if (!readHdr (file, pos))
+    if (!read_hdr (file, pos))
     {
         return false;
     }
@@ -101,14 +103,14 @@ Record::read(File& file,
     if (hdr.magic != MAGIC_R)
     {
         assert (hdr.magic == MAGIC_M);
-        if (!readHdr (file, pos + sizeof (Marker::mark)))
+        if (!read_hdr (file, pos + sizeof (Marker::mark)))
         {
             return false;
         }
         assert (hdr.magic == MAGIC_R);
     }
 
-    return readBody (file);
+    return read_body (file);
 }
 
 bool
@@ -178,28 +180,22 @@ Journal::Journal(int id) :
 
 Journal::~Journal()
 {
-    if (!m_file.isOpen ())
+    if (!m_file.is_open ())
     {
-        //debugJrsJournal(cosim::Dbg::JOURNAL, "done" );
         return;
     }
-
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "done, fd=%lx", &m_file );
 
     m_file.close ();
 }
 
 bool
-Journal::openForRead(const char* filename,
-    bool unbuffered)
+Journal::openForRead(const char* filename, bool unbuffered)
 {
-    if (isOpen ())
+    if (is_open ())
         return false;
 
     if (!m_file.open (filename, "r"))
         return false;
-
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "openForRead \"%s\", fd=%lx", filename, &m_file );
 
     // Force unbuffered operation.
     if (unbuffered)
@@ -216,13 +212,11 @@ bool
 Journal::openNew(const char* filename,
     bool unbuffered)
 {
-    if (isOpen ())
+    if (is_open ())
         return false;
 
     if (!m_file.open (filename, "w+"))
         return false;
-
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "openNew \"%s\", fd=%lx", filename, &m_file );
 
     // Force unbuffered operation.
     if (unbuffered)
@@ -236,13 +230,11 @@ Journal::openNew(const char* filename,
 bool
 Journal::openAppend(const char* filename)
 {
-    if (isOpen ())
+    if (is_open ())
         return false;
 
     if (!m_file.open (filename, "a+"))
         return false;
-
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "openAppend \"%s\", fd=%lx", filename, &m_file );
 
     //seqCount = ;read last record and get seqId
 
@@ -254,20 +246,17 @@ File::pos_t
 Journal::read(Record& rec,
     File::pos_t pos)
 {
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "read pos %"PRId64", fd=%lx", pos, &m_file );
-
-    assert (isOpen ());
+    assert (is_open ());
 
     if (pos == File::NPOS)
         return File::NPOS;
 
     if (!rec.read (m_file, pos))
     {
-        //debugJrsJournal(cosim::Dbg::JOURNAL+12, "eof" );
         return File::NPOS;
     }
 
-    return rec.nextRecord ();
+    return rec.next_record ();
 }
 
 bool
@@ -277,9 +266,7 @@ Journal::addRecord(
     tick_t tick,
     user_id_t userId)
 {
-    assert (isOpen ());
-
-    //debugJrsJournal(cosim::Dbg::JOURNAL, "addRecord pos %"PRId64", fd=%lx", ftell(m_file), &m_file );
+    assert (is_open ());
 
     if ((m_seq_count % MARKER_SPAN) == 0)
     {
@@ -301,7 +288,7 @@ Journal::addRecord(
 bool
 Journal::addRecord(Record& record)
 {
-    assert (isOpen ());
+    assert (is_open ());
 
     return record.write (m_file);
 }
