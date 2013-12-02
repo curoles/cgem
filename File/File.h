@@ -11,6 +11,8 @@
 #include <string>
 #include <functional>
 
+namespace gem {
+
 class File
 {
 public:
@@ -185,5 +187,6 @@ bool fwrite_val(File& file, T& val)
     return fwrite ((void*)&val, sizeof (val), 1, file);
 }
 
+} // end namespace gem
 
 #endif

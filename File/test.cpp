@@ -4,6 +4,7 @@
 #include "cgem/File.h"
 
 using namespace std;
+using namespace gem;
 
 int main()
 {

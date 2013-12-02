@@ -8,8 +8,7 @@
 
 #include <assert.h>
 
-namespace jrs
-{
+namespace gem { namespace jrs {
 
 Record::Record() :
     file_pos (File::NPOS),
@@ -170,8 +169,7 @@ Marker::read(File& file,
     return rec.readHdr(file, cur_pos)? rec.nextRecord() : File::NPOS;
    }*/
 
-Journal::Journal(int id) :
-    m_id (id),
+Journal::Journal() :
     m_seq_count (0),
     m_last_record_pos (0)
 {
@@ -189,7 +187,7 @@ Journal::~Journal()
 }
 
 bool
-Journal::openForRead(const char* filename, bool unbuffered)
+Journal::open_for_read(const char* filename, bool unbuffered)
 {
     if (is_open ())
         return false;
@@ -209,8 +207,7 @@ Journal::openForRead(const char* filename, bool unbuffered)
 }
 
 bool
-Journal::openNew(const char* filename,
-    bool unbuffered)
+Journal::open_new(const char* filename, bool unbuffered)
 {
     if (is_open ())
         return false;
@@ -228,7 +225,7 @@ Journal::openNew(const char* filename,
 }
 
 bool
-Journal::openAppend(const char* filename)
+Journal::open_append(const char* filename)
 {
     if (is_open ())
         return false;
@@ -243,8 +240,7 @@ Journal::openAppend(const char* filename)
 
 
 File::pos_t
-Journal::read(Record& rec,
-    File::pos_t pos)
+Journal::read(Record& rec, File::pos_t pos)
 {
     assert (is_open ());
 
@@ -260,7 +256,7 @@ Journal::read(Record& rec,
 }
 
 bool
-Journal::addRecord(
+Journal::add_record(
     size_t body_size,
     const uint8_t* body,
     tick_t tick,
@@ -270,7 +266,7 @@ Journal::addRecord(
 
     if ((m_seq_count % MARKER_SPAN) == 0)
     {
-        addMarker (tick);
+        add_marker (tick);
     }
 
     Record record;
@@ -282,11 +278,11 @@ Journal::addRecord(
 
     record.body = (uint8_t*)body;
 
-    return addRecord (record);
+    return add_record (record);
 }
 
 bool
-Journal::addRecord(Record& record)
+Journal::add_record(Record& record)
 {
     assert (is_open ());
 
@@ -294,7 +290,7 @@ Journal::addRecord(Record& record)
 }
 
 bool
-Journal::addMarker(tick_t tick)
+Journal::add_marker(tick_t tick)
 {
     Marker marker;
     marker.mark.magic = MAGIC_M;
@@ -306,4 +302,4 @@ Journal::addMarker(tick_t tick)
     return marker.write (m_file);
 }
 
-} // namespace jrs
+}} // namespace jrs

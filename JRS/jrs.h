@@ -20,8 +20,7 @@
 
 #include "cgem/File.h"
 
-namespace jrs
-{
+namespace gem { namespace jrs {
 
 typedef uint64_t seq_id_t;
 typedef uint64_t tick_t;
@@ -98,14 +97,15 @@ struct Marker
     bool read(File& file, File::pos_t pos = 0);
     bool write(File& file);
 
-    inline File::pos_t nextMarker() const {
+    inline File::pos_t next_marker() const {
         return file_pos + mark.span;
     }
-    inline File::pos_t prevMarker() const {
+
+    inline File::pos_t prev_marker() const {
         return mark.prev_marker;
     }
 
-    inline File::pos_t firstRecord() const {
+    inline File::pos_t first_record() const {
         return file_pos + sizeof (mark);
     }
     //File::pos_t nextRecord(File& file, File::pos_t cur_pos) const;
@@ -113,10 +113,13 @@ struct Marker
 
 class Journal
 {
-    public:
-    bool openForRead(const char* filename, bool unbuffered = false);
-    bool openNew(const char* filename, bool unbuffered = false);
-    bool openAppend(const char* filename);
+public:
+    Journal();
+    ~Journal();
+
+    bool open_for_read(const char* filename, bool unbuffered = false);
+    bool open_new(const char* filename, bool unbuffered = false);
+    bool open_append(const char* filename);
 
     void close() {
         m_file.close ();
@@ -133,49 +136,48 @@ class Journal
     long int get_current_file_position() {
         return m_file.current_position ();
     }
-    void rewindBeginning() {
+
+    void rewind_to_beginning() {
         fflush (m_file);
         rewind (m_file);
     }
 
-    bool addRecord(
+    bool add_record(
         size_t body_size,
         const uint8_t* body,
         tick_t tick = 0,
         user_id_t userId = 0);
 
     template <class T>
-    bool addRecord_Val(
+    bool add_record_val(
         T& val,
         tick_t tick = 0,
         user_id_t userId = 0)
     {
-        return addRecord (sizeof (val), (uint8_t*)&val, tick, userId);
+        return add_record (sizeof (val), (uint8_t*)&val, tick, userId);
     }
 
     File::pos_t read(Record& rec, File::pos_t pos);
 
-    seq_id_t getSequenceCount() const {
+    seq_id_t get_sequence_count() const {
         return m_seq_count;
     }
 
-    Journal(int id = -1);
-    ~Journal();
+private:
+    bool add_marker (tick_t);
+    bool add_record(Record& record);
 
-    private:
-    bool addMarker (tick_t);
-    bool addRecord(Record& record);
-
-    private:
+private:
     File m_file;
-    int m_id;
     seq_id_t m_seq_count;
     File::pos_t m_last_record_pos;
 
     static const seq_id_t MARKER_SPAN = 100;
 };
 
-} // jrs
+bool convert_to_text(const char* fin, const char* fout);
+
+}} // jrs
 
 
  #endif
