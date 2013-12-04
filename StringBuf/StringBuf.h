@@ -51,7 +51,9 @@ class StringBuf
     gemStringBuf buf;
 
 public:
-    StringBuf(char* storage, size_t size) { gemStringBuf_construct(&buf, storage, size); }
+    StringBuf(char* storage=nullptr, size_t size=32) {
+        gemStringBuf_construct(&buf, storage, size);
+    }
    ~StringBuf() { buf.destruct(&buf); }
 
     void reset() { buf.reset(&buf); }

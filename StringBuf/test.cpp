@@ -23,6 +23,14 @@ int main()
 
     printf("%s\n", buf.c_str());
 
+    gem::StringBuf xml;
+    xml.print(
+R"XML(<tag0>
+  <str>%s</str>
+  <num>%d</num>
+</tag0>)XML", "hello", 123);
+    printf("%s\n", xml.c_str());
+
     return 0;
 }
 
