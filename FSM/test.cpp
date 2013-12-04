@@ -60,36 +60,77 @@ struct DefaultEventDispatcher
 };
 
 template<typename Head, typename ...Tail>
-struct fold
+struct fold_event_dispatchers
 {
     typedef Head type;
 };
  
 template<typename Head, typename Next, typename... Tail>
-struct fold<Head, Next, Tail...>
+struct fold_event_dispatchers<Head, Next, Tail...>
 {
-    typedef typename fold<
+    typedef typename fold_event_dispatchers<
         EventDispatcher<Head,Next>,
         Tail...
     >::type type;
 };
 
 template<typename Head, typename Next, typename Next2, typename... Tail>
-struct fold<Head, Next, Next2, Tail...>
+struct fold_event_dispatchers<Head, Next, Next2, Tail...>
 {
-    typedef typename fold<
+    typedef typename fold_event_dispatchers<
         EventDispatcher<Head, EventDispatcher<Next,Next2> >,
         Tail...
     >::type type;
 };
 
+template<class DefaultDispatcher, typename Tuple>
+struct fold_dispatchers;
+
+template<class DefaultDispatcher, typename... T>
+struct fold_dispatchers<DefaultDispatcher, std::tuple<T...> >
+{
+    typedef typename fold_event_dispatchers<
+        T...,
+        DefaultDispatcher
+    >::type type;
+};
+
+template<class Event, typename Tuple>
+struct filter_transitions_by_event;
+
+template<class Event>
+struct filter_transitions_by_event<Event, std::tuple<> >
+{
+    using type = std::tuple<>;
+};
+
+template<typename T, typename Tuple>
+struct cons_tuple;
+
+template<typename T, typename ...Args>
+struct cons_tuple<T, std::tuple<Args...> >
+{
+    using type = std::tuple<T, Args...>;
+};
+
+template<class Event, typename Head, typename... Tail>
+struct filter_transitions_by_event<Event, std::tuple<Head, Tail...> >
+{
+    using type = typename std::conditional<
+        std::is_same<Event, typename Head::event>::value,
+        typename cons_tuple<
+            Head,
+            typename filter_transitions_by_event<Event, std::tuple<Tail...>>::type
+        >::type,
+        typename filter_transitions_by_event<Event, std::tuple<Tail...> >::type
+    >::type;
+};
+
 template<class Table, class Event>
 struct generate_dispatcher :
-    fold<
-        //std::get<0>(Table),
-        typename std::tuple_element<0, Table>::type,
-        typename std::tuple_element<2, Table>::type,
-        DefaultEventDispatcher
+    fold_dispatchers<
+        DefaultEventDispatcher,
+        typename filter_transitions_by_event<Event, Table>::type
     >
 {};
 
@@ -142,6 +183,8 @@ public:
 
 
     typedef std::tuple<
+    //               State     Event         Next      Action
+    //             <---------+-------------+---------+--------------------------->
     ST::Transition < Empty   , open_close  , Open    , &CDPlayer::open_drawer    >,
     ST::Transition < Empty   , cd_detected , Stopped , &CDPlayer::store_cd_info  >,
     ST::Transition < Open    , open_close  , Empty   , &CDPlayer::close_drawer   >,
@@ -180,6 +223,11 @@ void CDPlayer::close_drawer(open_close const&)
     cout << "state=" << state_ << " action=close_drawer\n";
 }
 
+void CDPlayer::store_cd_info(cd_detected const&)
+{
+    cout << "state=" << state_ << " action=store_cd_info\n";
+}
+
 void CDPlayer::start_playback(play const&)
 {
     cout << "state=" << state_ << " action=start_playback\n";
@@ -191,6 +239,7 @@ int main()
 
     player.process_event(CDPlayer::open_close()); // open
     player.process_event(CDPlayer::open_close()); // insert CD and close
+    player.process_event(CDPlayer::cd_detected());
 
     return 0;
 }

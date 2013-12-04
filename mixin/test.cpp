@@ -38,6 +38,8 @@ struct Super
     const string& name()const{return m_name;}
 };
 
+// TODO check http://en.cppreference.com/w/cpp/language/parameter_pack mixins
+//
 template<class Super>
 class Mixer : public A<Super>, public B<Super>
 {
