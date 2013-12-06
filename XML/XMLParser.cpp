@@ -51,6 +51,11 @@ walk(
                     if (on_element_start != nullptr)
                     {
                         on_element_start(element, pos+1);
+                        bool is_decl_tag = element[0] == '?';
+                        if (is_decl_tag and on_element_end != nullptr)
+                        {
+                            on_element_end(element, pos+1);
+                        }
                     }
                 }
             }
