@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <string>
 #include <functional>
+#include <stdexcept>
 
 namespace gem {
 
@@ -119,7 +120,7 @@ public:
     static
     std::string read(const std::string& filename) {
         std::string text;
-        File::open (filename, "r", [&text](File& f)->bool{
+        bool ok = File::open (filename, "r", [&text](File& f)->bool{
             std::string line;
             while (f.read_line(line))
             {
@@ -128,6 +129,9 @@ public:
 
             return true;
         });
+
+        if (not ok)
+            throw std::runtime_error(std::string("can't open file ")+filename);
 
         return text;
     }

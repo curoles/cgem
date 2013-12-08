@@ -43,7 +43,7 @@ walk(
                 {
                     if (on_element_end != nullptr)
                     {
-                        on_element_end(element, pos-element.size()-1);
+                        on_element_end(element.substr(1), pos-element.size()-1);
                     }
                 }
                 else
@@ -51,8 +51,16 @@ walk(
                     if (on_element_start != nullptr)
                     {
                         on_element_start(element, pos+1);
+
                         bool is_decl_tag = element[0] == '?';
-                        if (is_decl_tag and on_element_end != nullptr)
+                        if (is_decl_tag and element.back() != '?')
+                            throw xml::exception("unmatching '?'");
+
+                        bool is_comment = element[0] == '!';
+
+                        bool is_empty_tag = element.back() == '/' or is_decl_tag or is_comment;
+
+                        if (is_empty_tag and on_element_end != nullptr)
                         {
                             on_element_end(element, pos+1);
                         }
@@ -91,19 +99,35 @@ parse(
 
     xml::Walker walker;
 
+    auto extract_tag = [](const xml::string& s)->xml::string {
+        return s.substr(0, s.find_first_of(" \t\n\r"));
+    };
+
     auto on_start = [&](const xml::string el, xml::string::size_type pos)->void {
-        xml::string tag = el;
+        xml::string tag = extract_tag(el);
+
+        if (on_element_start != nullptr)
+        {
+            AttrList attrs;
+
+            on_element_start(
+                path, tag, attrs
+            );
+        }
+
         path.push_back(tag);
         path_pos.push_back(pos);
     };
 
     auto on_end = [&](const xml::string el, xml::string::size_type pos)->void {
-        xml::string tag = el.substr(1);
-        auto expected_tag = path.back();
+        xml::string tag = extract_tag(el);
+        auto expected_tag = extract_tag(path.back());
         auto content_begin = path_pos.back();
         path.pop_back();
         path_pos.pop_back();
-        //TODO assert tag == expected_tag
+        if (tag != expected_tag)
+            throw xml::exception(std::string("unmatching tags <")+expected_tag+"> <"+tag+">");
+
         if (on_element_end != nullptr)
         {
             on_element_end(

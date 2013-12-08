@@ -12,6 +12,7 @@ std::string xml_text = R"XML(
   <tag2 attr1="attr1"
         attr2="attr2">world</tag2>
 
+  <tag3 attr1="attr1" /> <!-- empty element tag -->
 </tag0>
 )XML";
 
@@ -41,12 +42,17 @@ int main()
         )->void
     {
         std::cout << "on end: tag=" << tag
-        << " parent=" << path.back()
+        << " parent=" << (path.empty()? "N/A":path.back())
         << " content=\n" << xml_text.substr(content_begin, content_size)
         << "\n";
     };
 
-    parser.parse(xml_text, /*on_start=*/nullptr, on_end);
+    try {
+        parser.parse(xml_text, /*on_start=*/nullptr, on_end);
+    }
+    catch (xml::exception& e) {
+        std::cout << "EXCEPTION:" << e.what() << "\n";
+    }
 
     return 0;
 }

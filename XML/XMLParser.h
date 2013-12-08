@@ -11,6 +11,7 @@
 #include <string>
 #include <list>
 #include <functional>
+#include <stdexcept>
 
 namespace gem { namespace xml {
 
@@ -19,6 +20,12 @@ typedef std::string string;
 enum class Error
 {
     OK = 0
+};
+
+class exception : public std::runtime_error
+{
+public:
+    exception(const string& what):runtime_error(what){}
 };
 
 class Walker
