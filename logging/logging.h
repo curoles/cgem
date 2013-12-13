@@ -39,6 +39,8 @@ public:
             std::cout.std::ios::rdbuf() : std::cerr.std::ios::rdbuf());
     }
 
+    Stream(const Stream&) /*= delete;*/ {}
+
     void print(const char* msg);
 };
 
@@ -55,7 +57,9 @@ private:
     level_type current_stream_level;
 
 public:
-    Logger(level_type level=DBG_LEVEL):level(level), current_stream_level(level)
+    Logger(const Logger&) = delete;
+
+    Logger(level_type level=DBG_LEVEL):level(level), current_stream_level(0)
     {
     }
 
