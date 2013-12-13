@@ -23,21 +23,6 @@ typedef std::size_t level_type;
 
 struct Level { level_type level; Level(level_type l):level(l){} };
 
-struct Color
-{
-    short clr;
-    enum { RESET = 0, BLUE = 34, MAGENTA = 35 };
-
-    Color(short c = RESET):clr(c){}
-
-    std::string operator()() {
-        return std::string("\033[") + std::to_string(clr) + "m";
-    }
-
-    static Color reset;
-    static Color magenta;
-    static Color blue;
-};
 
 class Stream
 {
@@ -136,9 +121,29 @@ public:
         return *this;
     }
 
+    Logger& operator()(level_type level)
+    {
+        current_stream_level = level;
+        return *this;
+    }
 
 };
 
+struct Color
+{
+    short clr;
+    enum { RESET = 0, BLUE = 34, MAGENTA = 35 };
+
+    Color(short c = RESET):clr(c){}
+
+    std::string operator()() {
+        return std::string("\033[") + std::to_string(clr) + "m";
+    }
+
+    static Color reset;
+    static Color magenta;
+    static Color blue;
+};
 
 } // end logging
 
