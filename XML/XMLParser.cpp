@@ -76,9 +76,16 @@ walk(
         {
             if (is_tag_opening(c))
             {
-                tag = true;
-                //skip_ws = false;
-                element.erase();
+                if ((pos < text.size()-3) and text.substr(pos+1,3) == "!--")
+                {
+                    do { ++ptr; ++pos; } while (ptr != text.end() and text.substr(pos,3) != "-->");
+                }
+                else
+                {
+                    tag = true;
+                    //skip_ws = false;
+                    element.erase();
+                }
             }
         }
     }
