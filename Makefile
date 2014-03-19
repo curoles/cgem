@@ -43,6 +43,7 @@ all: $(BUILD_DIR) $(INSTALL_DIR)
 	make -C C/stack_direction $(MAKE_ENV)
 	make -C JRS               $(MAKE_ENV)
 	make -C XML               $(MAKE_ENV)
+	make -C Graph             $(MAKE_ENV)
 	$(AR) -t -v $(CGEM_LIB)
 	$(AR) -t -v $(XGEM_LIB)
 
