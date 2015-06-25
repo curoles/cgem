@@ -18,22 +18,23 @@ void provider()
         }
         else {
             std::cout << "provider waits\n";
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 }
 
 void consumer()
 {
-    while (1) {
-        if (not buf.empty()) {
+    bool keep_running(true);
+
+    while (keep_running) {
+        while (buf.wait_for(1) == std::cv_status::timeout) {
+            std::cout << "consumer waits for data\n";
+        }
+        while (not buf.empty()) {
             int item = buf.pop();
             std::cout << "pop " << item << "\n";
-            if (item > 90) break;
-        }
-        else {
-            std::cout << "consumer waits\n";
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+            if (item > 90) {keep_running=false; break;}
         }
     }
 }

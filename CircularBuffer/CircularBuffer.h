@@ -13,6 +13,8 @@
 #include <array>
 #include <atomic>
 #include <cassert>
+#include <mutex>
+#include <condition_variable>
 
 namespace gem {
 
@@ -53,6 +55,7 @@ public:
         if (full()) return false;
         buffer_[push_ptr_ % SIZE] = item;
         push_ptr_++;
+        data_available_event_.notify_one();
         return true;
     }
 
@@ -71,14 +74,24 @@ public:
         return item;
     }
 
-    reference front() {
+    T& front() {
         return buffer_[pop_ptr_ % SIZE];
+    }
+
+    //@return std::cv_status::timeout or std::cv_status::no_timeout
+    std::cv_status wait_for(uint64_t timeout_millisec) {
+        std::unique_lock<std::mutex> lock(event_mutex_);
+        return data_available_event_.wait_for(lock, std::chrono::milliseconds(timeout_millisec));
     }
 
 private:
     Array buffer_;
+
     std::atomic<std::size_t> push_ptr_;
     std::atomic<std::size_t> pop_ptr_;
+
+    std::mutex event_mutex_;
+    std::condition_variable data_available_event_;
 };
 
 } // end of namespace gem
