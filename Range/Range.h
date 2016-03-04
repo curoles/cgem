@@ -1,10 +1,25 @@
-#pragma once
-
-/**
+/**@file
+ * @brief     Range class for easy looping with C++11 'for' 
+ * @author    Igor Lesik
+ * @copyright 2013-2015 Igor Lesik
+ *
+ *   Usage:
+ *
+ *   for (auto i : range(5, 16, 3))
+ *   {
+ *       cout << i << "\n";
+ *   }
+ *
+ *   for (auto f : range(5.1, 8.3, 0.6))
+ *   {
+ *       cout << f << "\n";
+ *   }
+ *
  * http://xanduchene.wordpress.com/2013/03/17/pythonic-ranges-in-c11/
  * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3350.html
  * https://github.com/serge-sans-paille/pythran
  */
+#pragma once
 
 #include <iterator>
 

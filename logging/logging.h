@@ -1,154 +1,164 @@
 /**@file
  * @brief     Logging
  * @author    Igor Lesik
- * @copyright 2013 Igor Lesik
+ * @copyright 2013-2015 Igor Lesik
  *
  * Other interesting implementations:
  * - http://www.drdobbs.com/cpp/a-highly-configurable-logging-framework/225700666
  * - http://www.drdobbs.com/cpp/a-lightweight-logger-for-c/240147505
+ * - Boost.Log
  */
-
-#include <cstring>
+#pragma once
 
 #include <string>
 #include <list>
 #include <iostream>
 #include <fstream>
-#include <memory>
-#include <cstdarg>
+#include <chrono>
+#include <mutex>
 
-namespace logging {
+#include <ext/stdio_sync_filebuf.h> // __gnu_cxx::stdio_filebuf
 
-typedef std::size_t level_type;
+namespace cgem { namespace Log {
 
-struct Level { level_type level; Level(level_type l):level(l){} };
-
-
+/** Factory class that creates output stream depending on ctor signature.
+ *
+ */
 class Stream
 {
 public:
+    /// Created stream as result of calling ctor Stream
     std::ofstream stream;
 
 public:
-    Stream(const char* file_name):stream(file_name, std::ofstream::out) {
-    }
+    /// Create stream to output to file
+    Stream(const char* file_name);
 
-    /// Create Stream that outputs to stdout and stderr 
-    Stream(int std_out = 0) {
-        stream.std::ios::rdbuf( (std_out == 0)?
-            std::cout.std::ios::rdbuf() : std::cerr.std::ios::rdbuf());
-    }
+    /// Create stream to output to stdout and stderr 
+    Stream(int std_out = 0);
 
-    Stream(const Stream&) /*= delete;*/ {}
+    /// Create stream using C file descriptor
+    Stream(FILE* fd);
 
-    void print(const char* msg);
-};
+    /// No copy ctor
+    Stream(const Stream&) = delete;
 
-template<std::size_t DBG_LEVEL>
-class Logger
-{
-public:
-    typedef std::list<Stream> StreamList;
+    /// No move ctor
+    Stream(const Stream&&) = delete;
+
+    /// Helper to output C string
+    void write(const char* msg);
 
 private:
+    /// Helper to implement stream to FILE*
+    __gnu_cxx::stdio_sync_filebuf<char> filebuf;
+};
+
+typedef std::chrono::high_resolution_clock Chronometer;
+
+/** Sink is Logger output destination device.
+ *
+ */
+class Sink
+{
+private:
+    typedef std::list<Stream> StreamList;
     StreamList streams;
 
-    level_type level;
-    level_type current_stream_level;
+    std::size_t m_creation_time;
+
+    //std::mutex m_mutex;
 
 public:
-    Logger(const Logger&) = delete;
+    Sink();
+    Sink(const Sink&) = delete;
+    Sink(const Sink&&) = delete;
+   ~Sink();
 
-    Logger(level_type level=DBG_LEVEL):level(level), current_stream_level(0)
-    {
-    }
+    static Sink* instance();
 
-    bool add_stream(const char* file_name) {
+    void add_stream(const char* file_name) {
         streams.emplace_back(file_name);
-        return true;
     }
 
-    bool add_stdout_stream(int std_out = 0) {
+    void add_stream(const std::string& file_name) {
+        streams.emplace_back(file_name.c_str());
+    }
+
+    void add_stdout_stream(int std_out = 0) {
         streams.emplace_back(std_out);
-        return true;
     }
 
-    template<std::size_t LEVEL>
-    void print(const char* frmt, ...)
-    {
-        if (LEVEL <= DBG_LEVEL)
-        {
-            if (LEVEL <= level)
-            {
-                char buf[128];
-                va_list args;
-                va_start (args, frmt);
-                vsnprintf(buf, sizeof(buf), frmt, args);
-
-                for (auto& stream : streams)
-                {
-                    stream.print(buf);
-                }
-
-                va_end(args);
-            }
-        }
+    void add_stream(FILE* fd) {
+        streams.emplace_back(fd);
     }
+
+    std::size_t getCreationTime() const {return m_creation_time;}
+
+    void write(const char* msg);
+
+    void print(const char* frmt, ...);
 
     template <typename T>
-    Logger& operator<<(const T& a)
+    Sink& operator<<(const T& a)
     {
-        if (current_stream_level <= DBG_LEVEL and current_stream_level <= level)
-        {
-            for (auto& stream : streams)
-            {
-                stream.stream << a; 
-            }
-        }
-        return *this;
+
+       //std::lock_guard<std::mutex> lock_guard(m_mutex);
+
+       for (auto& stream : streams)
+       {
+           stream.stream << a; 
+       }
+       return *this;
     }
 
     /// Support manipulators like std::endl
-    Logger& operator<< (std::ostream& (*pf)(std::ostream&))
+    Sink& operator<< (std::ostream& (*pf)(std::ostream&))
     {
         for (auto& stream : streams)
         {
             stream.stream << pf; 
         }
-
-        return *this;
-    }
-
-    Logger& operator<<(const Level& level)
-    {
-        current_stream_level = level.level;
-        return *this;
-    }
-
-    Logger& operator()(level_type level)
-    {
-        current_stream_level = level;
         return *this;
     }
 
 };
 
-struct Color
+/** Logger implementation.
+ *
+ */
+class Logger
 {
-    short clr;
-    enum { RESET = 0, BLUE = 34, MAGENTA = 35 };
+private:
+    Sink* m_sink; ///< output device
+    Sink  m_null; ///< null output device to throw away verbose messages
 
-    Color(short c = RESET):clr(c){}
+    std::size_t m_max_level; ///< verbosity limit
 
-    std::string operator()() {
-        return std::string("\033[") + std::to_string(clr) + "m";
-    }
+    std::string m_name; ///< module/component name shown in header
 
-    static Color reset;
-    static Color magenta;
-    static Color blue;
+public:
+   explicit Logger(std::size_t max_level = 10);
+   explicit Logger(Sink* sink, std::size_t max_level = 10);
+
+   Logger(const Logger& master):
+       m_sink(master.m_sink), m_max_level(master.m_max_level)
+   {}
+
+   /// Usage: log(DBG) << msg or log(DBG).print(...)
+   Sink& operator()(std::size_t level);
+
+   /// Set logger name shown in message header
+   std::string setName(const std::string& new_name);
+
+private:
+   /// Print message header 
+   void print_header(std::size_t level);
 };
 
-} // end logging
+enum { ALWAYS=0, ERR=ALWAYS, NOTE, WARN=NOTE, INFO, DBG };
 
+#define LOG_PRINT(logger, level, frmt, ...) \
+    logger(level).print(frmt, ## __VA_ARGS__)
 
+}} // cgem::Log
