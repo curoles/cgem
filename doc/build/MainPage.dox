@@ -1,0 +1,55 @@
+/**
+\file
+\mainpage CGEM Build
+
+\tableofcontents
+
+
+\section section_Requirements Sysrem Requirements and Prerequisites
+
+Presently CGEM is built and tested on Linux systems only.
+
+Tools and pakages required for building CGEM:
+\li GNU C/C++
+\li Doxygen
+
+
+\section section_GetSources Get Sources
+
+CGEM source files are located at GitHub.
+You will need `git` to be installed on your system.
+
+Create a directory for CGEM source files somewhere in your
+working area, `cd` into it and initialize GIT repo.
+\code{.sh}
+cd ~/prj/github
+mkdir -p cgem/cgem
+cd cgem/cgem
+git init
+\endcode
+
+Configure pointer to the CGEM repo on GitHub.
+\code{.sh}
+git remote add origin https://github.com/curoles/cgem.git
+# Creates a remote named "origin" pointing at your GitHub repository
+\endcode
+
+Pull the source files from GitHub to the local repo.
+\code{.sh}
+git pull origin master
+\endcode
+
+
+
+
+
+\section section2 Section2
+hello \ref page_AAAA
+
+\subsection section21 Section21
+\section section3 Section3
+
+\page page_AAAA Page about AAAA
+
+
+*/
