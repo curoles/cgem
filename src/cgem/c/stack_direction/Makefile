@@ -4,6 +4,7 @@ include $(SOURCE_DIR)/src/build/std.makefile
 $(call std_prolog)
 $(if $(debug_make),$(info Processing $(sp).Makefile))
 
+targets += $(this_build)/stack_direction.c.o
 
 .PHONY: $(sp)_build
 $(sp)_build: $(targets)

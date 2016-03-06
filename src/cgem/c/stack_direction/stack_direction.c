@@ -2,7 +2,7 @@
  * @brief  Find what direction stack grows.
  * @author Igor Lesik
  */
-#include "cgem/c/stack_direction.h"
+#include "cgem/c/stack_direction/stack_direction.h"
 
 /**
  * @return 1 if up, -1 if down

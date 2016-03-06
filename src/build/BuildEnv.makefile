@@ -10,6 +10,8 @@ DOXYGEN := doxygen
 MARKDOWN := markdown
 NATURALDOCS := NaturalDocs
 
+CFLAGS := -I$(SOURCE_DIR)/src
+
 ifeq ($(HOSTNAME),pc104.smi.local)
 
 CC  := /tools/local/gcc-5.2.0/bin/gcc

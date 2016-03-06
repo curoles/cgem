@@ -10,14 +10,16 @@ include $(SOURCE_DIR)/src/build/BuildRules.makefile
 
 
 .PHONY: all
-all: .doc_build
+all: all_docs .c_build .cpp_build
 
-#.src_cgem_c
+.PHONY: all_docs
+all_docs: .doc.build_build .doc.c_build .doc.cpp_build
 
 #.src_c .src_cpp .doc_c .doc_cpp .doc_design
 
 include $(SOURCE_DIR)/doc/component.makefile
-#include $(SOURCE_DIR)/src/cgem/c/component.makefile
+include $(SOURCE_DIR)/src/cgem/c/component.makefile
+include $(SOURCE_DIR)/src/cgem/cpp/component.makefile
 
 .PHONY: clean
 clean:
