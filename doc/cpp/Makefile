@@ -6,7 +6,7 @@ $(if $(debug_make),$(info Processing $(sp).Makefile))
 $(if $(debug_make),$(info Current build dir: $($(sp)_this_build)))
 
 .PHONY: $(sp)_build
-$(sp)_build: $(targets)
-	@echo "end of $@: $^"
+$(sp)_build: $($(sp)_targets)
+	@echo $(call color-str,$(BIGre),Done $@: $^)
 
 $(call std_epilog)

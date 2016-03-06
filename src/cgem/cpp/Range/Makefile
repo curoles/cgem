@@ -5,7 +5,7 @@ $(call std_prolog)
 $(if $(debug_make),$(info Processing $(sp).Makefile))
 
 .PHONY: $(sp)_build
-$(sp)_build: $(targets)
+$(sp)_build: $($(sp)_targets)
 	@echo "end of $@: $^"
 
 

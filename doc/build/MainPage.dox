@@ -1,6 +1,7 @@
 /**
 \file
 \mainpage CGEM Build
+\author Igor Lesik 2016
 
 \tableofcontents
 
@@ -43,11 +44,19 @@ git pull origin master
 
 
 
-\section section2 Section2
+\section section_Building Building CGEM
 hello \ref page_AAAA
 
-\subsection section21 Section21
-\section section3 Section3
+\subsection section_DebugMake Debugging Make
+
+\code{.sh}
+make debug_make=1 --debug
+\endcode
+
+
+
+
+\section section_BuildSystem Build System
 
 \page page_AAAA Page about AAAA
 

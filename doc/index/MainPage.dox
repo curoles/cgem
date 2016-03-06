@@ -1,0 +1,18 @@
+/**
+\file
+\author Igor Lesik
+\mainpage CGEM Documentation Index
+
+<a href=../../../../doc/build/doxy/html/index.html>
+Build Documentation
+</a>
+
+<a href=../../../../doc/c/doxy/html/index.html>
+CGEM C Library Documentation
+</a>
+
+<a href=../../../../doc/cpp/doxy/html/index.html>
+CGEM C++ Library Documentation
+</a>
+
+*/

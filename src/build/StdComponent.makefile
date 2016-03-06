@@ -11,11 +11,11 @@ include $(SOURCE_DIR)/src/build/std.makefile
 $(call std_prolog)
 
 $(if $(debug_make),$(info Current Build Stack Pointer is $(sp)))
-$(if $(debug_make),$(info Current targets: $(targets)))
+$(if $(debug_make),$(info Current targets: $($(sp)_targets)))
 
 .PHONY: $(sp)_build
-$(sp)_build: $(targets)
-	@echo "end of $@: $^"
+$(sp)_build: $($(sp)_targets)
+	@echo $(call color-str,$(BIGre),Done $@)
 
 $(call std_epilog)
 

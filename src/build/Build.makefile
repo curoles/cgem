@@ -7,15 +7,14 @@ $(info Build.makefile)
 #MAKEFILES ?= --output-sync=target
 
 include $(SOURCE_DIR)/src/build/BuildRules.makefile
+include $(SOURCE_DIR)/src/build/TerminalAnsiColor.makefile
 
 
 .PHONY: all
 all: all_docs .c_build .cpp_build
 
 .PHONY: all_docs
-all_docs: .doc.build_build .doc.c_build .doc.cpp_build
-
-#.src_c .src_cpp .doc_c .doc_cpp .doc_design
+all_docs: .doc.index_build .doc.build_build .doc.c_build .doc.cpp_build
 
 include $(SOURCE_DIR)/doc/component.makefile
 include $(SOURCE_DIR)/src/cgem/c/component.makefile

@@ -42,9 +42,25 @@ define generate_build_infra
   $(info Makefile is generated, call make)
 endef
 
+define check-make-version =
+
+REQUIRE_MAKE_VER := 4.0
+MAKE_VER_OK := $$(filter $$(REQUIRE_MAKE_VER),$$(firstword $$(sort $$(MAKE_VERSION) $$(REQUIRE_MAKE_VER))))
+
+ifeq ($$(strip $$(MAKE_VER_OK)),)
+  $$(info MAKE version $$(MAKE_VERSION)...[ERROR])
+  $$(error Required make version is $$(REQUIRE_MAKE_VER))
+else
+  $$(info MAKE version $$(MAKE_VERSION)...[OK])
+endif
+
+endef
+
 define generate_main_makefile
   $(eval file_name := $1)
   $(file >>$(file_name),# Automatically generated on $(shell date))
+  $(file >>$(file_name),)
+  $(file >>$(file_name),$(check-make-version))
   $(file >>$(file_name),)
   $(file >>$(file_name),BUILD_DIR := $(BUILD_DIR))
   $(file >>$(file_name),SOURCE_DIR := $(SOURCE_DIR))

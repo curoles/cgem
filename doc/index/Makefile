@@ -1,6 +1,3 @@
-# Documentation makefile.
-#
-
 this_dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 include $(SOURCE_DIR)/src/build/std.makefile
 
@@ -16,7 +13,7 @@ $(sp)_build: $($(sp)_targets)
 
 .PHONY: $(sp)_doxygen
 $(sp)_doxygen: $($(sp)_this_build)/doxy/Doxyfile
-	@echo Building Build Documentation with Doxygen
+	@echo Building Index Documentation with Doxygen
 	$(DOXYGEN) $<
 
 $($(sp)_this_build)/doxy/Doxyfile: OUTPUT_DIR := $($(sp)_this_build)/doxy
@@ -24,11 +21,9 @@ $($(sp)_this_build)/doxy/Doxyfile: DOXY_CFG := $(this_dir)/Doxyfile
 $($(sp)_this_build)/doxy/Doxyfile: $($(sp)_this_build)/doxy $(DOXY_CFG)
 	cp $(DOXY_CFG) $@
 	echo "OUTPUT_DIRECTORY=$(OUTPUT_DIR)" >> $@
-	echo "INPUT=$(SOURCE_DIR)/MakeBuild.makefile $(SOURCE_DIR)/src/build" >> $@
-	echo "INPUT+=$(SOURCE_DIR)/doc/build" >> $@
+	echo "INPUT=$(SOURCE_DIR)/doc/index" >> $@
 
 $($(sp)_this_build)/doxy:
 	mkdir -p $@
-
 
 $(call std_epilog)

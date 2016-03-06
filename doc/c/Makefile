@@ -5,8 +5,26 @@ $(call std_prolog)
 $(if $(debug_make),$(info Processing $(sp).Makefile))
 $(if $(debug_make),$(info Current build dir: $($(sp)_this_build)))
 
+$(sp)_targets += $(sp)_doxygen
+
 .PHONY: $(sp)_build
-$(sp)_build: $(targets)
-	@echo "end of $@: $^"
+$(sp)_build: $($(sp)_targets)
+	@echo $(call color-str,$(BIGre),Done $@: $^)
+
+.PHONY: $(sp)_doxygen
+$(sp)_doxygen: $($(sp)_this_build)/doxy/Doxyfile
+	@echo Building C Library Documentation with Doxygen
+	$(DOXYGEN) $<
+
+$($(sp)_this_build)/doxy/Doxyfile: OUTPUT_DIR := $($(sp)_this_build)/doxy
+$($(sp)_this_build)/doxy/Doxyfile: DOXY_CFG := $(this_dir)/Doxyfile
+$($(sp)_this_build)/doxy/Doxyfile: $($(sp)_this_build)/doxy $(DOXY_CFG)
+	cp $(DOXY_CFG) $@
+	echo "OUTPUT_DIRECTORY=$(OUTPUT_DIR)" >> $@
+	echo "INPUT=$(SOURCE_DIR)/doc/c" >> $@
+	echo "INPUT+=$(SOURCE_DIR)/src/cgem/c" >> $@
+
+$($(sp)_this_build)/doxy:
+	mkdir -p $@
 
 $(call std_epilog)
