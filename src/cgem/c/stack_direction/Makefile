@@ -8,7 +8,7 @@ $(sp)_targets += $(this_build)/stack_direction.c.o $(this_build)/test.c.o
 
 .PHONY: $(sp)_build
 $(sp)_build: $($(sp)_targets)
-	@echo $(call color-str,$(BIGre),Done $@: $^)
+	@$(ECHO) $(call color-str,$(BIGre),Done $@: $^)
 
 
 $(call std_epilog)

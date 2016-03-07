@@ -12,11 +12,11 @@ $(sp)_targets += $(sp)_doxygen
 
 .PHONY: $(sp)_build
 $(sp)_build: $($(sp)_targets)
-	@echo $(call color-str,$(BIGre),Done $@: $^)
+	@$(ECHO) $(call color-str,$(BIGre),Done $@: $^)
 
 .PHONY: $(sp)_doxygen
 $(sp)_doxygen: $($(sp)_this_build)/doxy/Doxyfile
-	@echo Building Build Documentation with Doxygen
+	@$(ECHO) Building Build Documentation with Doxygen
 	$(DOXYGEN) $<
 
 $($(sp)_this_build)/doxy/Doxyfile: OUTPUT_DIR := $($(sp)_this_build)/doxy

@@ -11,7 +11,7 @@ CGEM_LIB_PATH := $(CGEM_LIB_INSTALL_DIR)/libcgem.a
 .PHONY: .c_link
 .c_link: FIND_CFG := -type f -name '*.o' -and -not -name 'test.c.o'
 .c_link: $(.c_targets)
-	@echo $(call color-str,$(BIYel),Linking $@: $^)
+	@$(ECHO) $(call color-str,$(BIYel),Linking $@: $^)
 	mkdir -p $(CGEM_LIB_INSTALL_DIR)
 	find $(.c_this_build) $(FIND_CFG) -exec $(AR) -rs $(CGEM_LIB_PATH) {} +
 	$(AR) -t -v $(CGEM_LIB_PATH)
@@ -26,9 +26,9 @@ CGEM_LIB_PATH := $(CGEM_LIB_INSTALL_DIR)/libcgem.a
 .c_test: COMPILE_TEST := $(CC) {} $(CGEM_LIB_PATH) -o test.out
 .c_test: FIND_TEST_EXE := find $(.c_this_build) -type f -name 'test.out'
 .c_test: $(.c_link)
-	@echo $(call color-str,$(BIYel),Testing $@: $^)
+	@$(ECHO) $(call color-str,$(BIYel),Testing $@: $^)
 	$(FIND_TEST_O) -execdir $(COMPILE_TEST) \;
-	$(FIND_TEST_EXE) -exec echo Running {} \; -execdir {} \;
+	$(FIND_TEST_EXE) -exec echo -e '$(BIBlu)'Run {} '$(RCol)' \; -execdir {} \;
 
 # Add .c_test dependency to .c_build target
 .c_build: .c_test

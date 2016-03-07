@@ -15,7 +15,7 @@ $(if $(debug_make),$(info Current targets: $($(sp)_targets)))
 
 .PHONY: $(sp)_build
 $(sp)_build: $($(sp)_targets)
-	@echo $(call color-str,$(BIGre),Done $@)
+	@$(ECHO) $(call color-str,$(BIGre),Done $@)
 
 $(call std_epilog)
 
