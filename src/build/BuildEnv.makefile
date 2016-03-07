@@ -5,12 +5,14 @@ $(info Host: $(HOSTNAME))
 
 CC  := gcc
 CXX := g++
+AR  := ar
 
 DOXYGEN := doxygen
 MARKDOWN := markdown
 NATURALDOCS := NaturalDocs
 
 CFLAGS := -I$(SOURCE_DIR)/src
+CXXFLAGS := -I$(SOURCE_DIR)/src -std=c++11
 
 ifeq ($(HOSTNAME),pc104.smi.local)
 

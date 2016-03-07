@@ -15,7 +15,7 @@ int cgem__find_stack_direction()
     if (addr_of_dummy == 0)            /* first entry into the function */
     {
         addr_of_dummy = &dummy;        /* save addr of variable on stack */
-        return find_stack_direction(); /* call itself to compare addresses */
+        return cgem__find_stack_direction(); /* call itself to compare addresses */
     }
     else                               /* second entry into the function */
         return (&dummy > addr_of_dummy)?  1 /* stack grew upward   */

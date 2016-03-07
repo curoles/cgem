@@ -15,4 +15,14 @@ CGEM C Library Documentation
 CGEM C++ Library Documentation
 </a>
 
+\author Igor Lesik 2009 - 2016
+
+\tableofcontents
+
+\section section_Intro Introduction
+
+CGEM purpose:
+\li CGEM is a library of useful C/C++ functions
+\li CGEM helps quickly build and run snippets of your code
+
 */

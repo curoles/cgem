@@ -1,6 +1,13 @@
 C GEM library
 =============
 
+Intro
+=====
+
+Purpose:
+- CGEM is a library of useful C/C++ functions
+- CGEM helps quickly build and run snippets of your code
+
 
 Get sources. GitHub HOWTO
 =========================
