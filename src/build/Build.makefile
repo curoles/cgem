@@ -14,7 +14,7 @@ include $(SOURCE_DIR)/src/build/TerminalAnsiColor.makefile
 all: all_docs .c_build .cpp_build
 
 .PHONY: all_docs
-all_docs: .doc.index_build .doc.build_build .doc.c_build .doc.cpp_build
+all_docs: .doc.index_build .doc.build_build .doc.c_build .doc.cpp_build .doc.d_build
 
 include $(SOURCE_DIR)/doc/component.makefile
 include $(SOURCE_DIR)/src/cgem/c/component.makefile
