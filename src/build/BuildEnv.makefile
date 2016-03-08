@@ -10,6 +10,7 @@ CXX := g++
 AR  := ar
 LD  := ld
 VALGRIND :=
+DC  := gdc 
 
 DOXYGEN := doxygen
 MARKDOWN := markdown
@@ -30,6 +31,7 @@ DOXYGEN     := /tools/local/doxygen-1.8.11/bin/doxygen
 else ifeq ($(HOSTNAME),smidev1)
 ECHO := echo
 #VALGRIND := valgrind --leak-check=yes
+#DC := /home/igor/tool/dmd/dmd.2.068.0/linux/bin32/dmd
 else ifeq ($(HOSTNAME),macL)
 #MAKE = /home/igor/tools/make/make-4.1/install/bin
 VLIB := echo

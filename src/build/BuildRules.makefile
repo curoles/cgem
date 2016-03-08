@@ -14,6 +14,10 @@ $(BUILD_DIR)/%.cpp.pic.o : $(SOURCE_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -fPIC -c $< -o $@
 
+$(BUILD_DIR)/%.d.o : $(SOURCE_DIR)/%.d
+	mkdir -p $(@D)
+	$(DC) $(DCFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/%.md.html : $(SOURCE_DIR)/%.md
 	mkdir -p $(@D)
 	$(MARKDOWN) $< > $@

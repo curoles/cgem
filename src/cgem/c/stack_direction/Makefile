@@ -11,17 +11,14 @@ $(sp)_targets += $(this_build)/stack_direction.c.pic.o
 $(sp)_build: $($(sp)_targets)
 	@$(ECHO) $(call color-str,$(BIGre),Done $@: $^)
 
+.PHONY: $(sp)_install
+$(sp)_install: THIS_DIR := $(this_dir)
+$(sp)_install: INSTALL_INCLUDE := $(BUILD_DIR)/install/include/cgem/c/stack_direction
+$(sp)_install: $($(sp)_targets)
+	mkdir -p $(INSTALL_INCLUDE)
+	cp $(THIS_DIR)/stack_direction.h $(INSTALL_INCLUDE)/.
+
+$(sp)_build: $(sp)_install
 
 $(call std_epilog)
-
-#TEST_DIR := $(BUILD_DIR)/test/C/stack_direction
-#TEST_PRG := $(TEST_DIR)/test.out
-
-#all:
-#	cp stack_direction.h $(INSTALL_INCLUDE_DIR)/C/stack_direction.h
-#	mkdir -p $(TEST_DIR)
-#	$(CC) $(CFLAGS) -c stack_direction.c -o $(BUILD_DIR)/obj/c/stack_direction.c.o
-#	$(AR) -rs $(CGEM_LIB) $(BUILD_DIR)/obj/c/stack_direction.c.o
-#	$(CC) $(CFLAGS)  -L$(INSTALL_LIB_DIR) test.c -lcgem -o $(TEST_PRG)
-#	cd $(TEST_DIR); $(TEST_PRG)
 
