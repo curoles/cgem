@@ -5,6 +5,7 @@ $(call std_prolog)
 $(if $(debug_make),$(info Processing $(sp).Makefile))
 
 $(sp)_targets += $(this_build)/stack_direction.c.o $(this_build)/test.c.o
+$(sp)_targets += $(this_build)/stack_direction.c.pic.o
 
 .PHONY: $(sp)_build
 $(sp)_build: $($(sp)_targets)

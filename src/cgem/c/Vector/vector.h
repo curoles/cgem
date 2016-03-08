@@ -9,6 +9,7 @@
  *
  *  See examples: vector_unit_test() and matrix_unit_test() in this file.
  */
+#pragma once
 #ifndef VECTOR_H_INCLUDED
 #define VECTOR_H_INCLUDED
 
@@ -100,7 +101,7 @@ static inline void vector_unit_test()
     uint32_t** alias;
 
     vector_init(&v, sizeof(uint32_t));
-    alias = &(v.element);
+    alias = (uint32_t**) &(v.element);
 
     for (i = 0; i < 22; ++i){
         vector_push_back(uint32_t, v, i);

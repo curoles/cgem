@@ -99,7 +99,7 @@ void trie_print(trie_t* t, size_t level)
 
         if (c == '\0')
         {
-            printf("%*s:%lu\n", (int)level, "", vector_at(vector_t, (*t), i).size);
+            printf("%*s:%zu\n", (int)level, "", vector_at(vector_t, (*t), i).size);
         }
         else
         {

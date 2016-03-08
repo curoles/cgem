@@ -38,7 +38,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "cgem/C/vector.h"
+#include "cgem/c/Vector/vector.h"
 
 typedef vector_t trie_t;
 
