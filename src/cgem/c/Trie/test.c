@@ -8,23 +8,23 @@ int main()
     size_t val;
     static char* dict[] = {"abs", "add", "sub", "mov", "mov32"};
 
-    trie_t t;
+    Trie t;
 
-    trie_init(&t);
+    Trie_init(&t);
 
     for (i = 0; i < (sizeof(dict)/sizeof(dict[0])); ++i) {
-        trie_store(&t, dict[i], i);
+        Trie_store(&t, dict[i], i);
     }
  
     printf("simple trie:\n");
-    trie_print(&t, 0);
+    Trie_print(&t, 0);
  
     for (i = 0; i < (sizeof(dict)/sizeof(dict[0])); ++i) {
-        trie_find(&t, dict[i], &val);
+        Trie_find(&t, dict[i], &val);
         assert(val == i);
     }
 
-    trie_destroy(&t);
+    Trie_destroy(&t);
 
     return 0;
 }

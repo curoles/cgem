@@ -16,7 +16,11 @@ $(BUILD_DIR)/%.cpp.pic.o : $(SOURCE_DIR)/%.cpp
 
 $(BUILD_DIR)/%.d.o : $(SOURCE_DIR)/%.d
 	mkdir -p $(@D)
+ifneq ($(shell which $(DC)),)
 	$(DC) $(DCFLAGS) -c $< -o $@
+else
+	$(DMD) $(DMDFLAGS) -w -c $< -of$@
+endif
 
 $(BUILD_DIR)/%.md.html : $(SOURCE_DIR)/%.md
 	mkdir -p $(@D)

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define VECTOR_UNIT_TEST
+#define CGEM_VECTOR_UNIT_TEST
 #include "cgem/c/Vector/vector.h"
 
 int main()

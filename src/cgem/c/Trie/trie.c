@@ -14,19 +14,19 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void trie_init(trie_t* t)
+void Trie_init(Trie* t)
 {
-    vector_init(t, sizeof(vector_t));
+    Vector_init(t, sizeof(Vector));
     t->reserved = 0;
 }
 
-void trie_store(trie_t* t, const char* str, size_t val)
+void Trie_store(Trie* t, const char* str, size_t val)
 {
     size_t i, found = 0;
 
     // scan top row for first character
     for (i = 0; i < t->size; ++i) {
-        if (vector_at(vector_t, (*t), i).reserved == (size_t)str[0]) {
+        if (Vector_at((*t), i, Vector).reserved == (size_t)str[0]) {
             found = 1;
             break;
         }
@@ -34,38 +34,38 @@ void trie_store(trie_t* t, const char* str, size_t val)
 
     if (!found) {
         i = t->size; // end of the vector, i.e. back+1
-        vector_t v = {0,0,0,NULL,str[0]};
-        vector_push_back(vector_t, (*t), v);
+        Vector v = {0,0,0,NULL,str[0]};
+        Vector_push_back((*t), Vector, v);
         if (str[0] != '\0') {
-            vector_init(&vector_at(vector_t,(*t),i), sizeof(vector_t));
+            Vector_init(&Vector_at((*t),i,Vector), sizeof(Vector));
         }
     }
 
     if (str[0] == '\0') {
-        vector_at(vector_t,(*t),i).size = val;
+        Vector_at((*t),i,Vector).size = val;
     }
     else {
-        trie_store(&vector_at(vector_t,(*t),i), str + 1, val);
+        Trie_store(&Vector_at((*t),i,Vector), str + 1, val);
     }
 }
 
-int trie_find(trie_t* t, const char* str, size_t* val)
+int Trie_find(Trie* t, const char* str, size_t* val)
 {
     uint32_t v; char c; size_t i;
 
     for (i = 0; i < t->size; ++i)
     {
-        v = vector_at(vector_t, (*t), i).size; // node value stored in "size" field.
-        c = (char)vector_at(vector_t, (*t), i).reserved;
+        v = Vector_at((*t), i, Vector).size; // node value stored in "size" field.
+        c = (char)Vector_at((*t), i, Vector).reserved;
 
         if (c == str[0])
         {
-            if (vector_at(vector_t, (*t), i).element == NULL) {
+            if (Vector_at((*t), i, Vector).element == NULL) {
                 *val = v;
                 return 1;
             }
             else {
-                return trie_find(&vector_at(vector_t, (*t), i), str + 1, val);
+                return Trie_find(&Vector_at((*t), i, Vector), str + 1, val);
             }
         }
     }
@@ -73,42 +73,42 @@ int trie_find(trie_t* t, const char* str, size_t* val)
     return 0;
 }
 
-void trie_destroy(trie_t* t)
+void Trie_destroy(Trie* t)
 {
     size_t i, size = t->size;
     assert(t);
 
     for (i = 0; i < size; ++i)
     {
-        if (vector_at(vector_t, (*t), i).element != NULL)
+        if (Vector_at((*t), i, Vector).element != NULL)
         {
-            trie_destroy(&vector_at(vector_t, (*t), i));
+            Trie_destroy(&Vector_at((*t), i, Vector));
         }
     }
-    vector_destroy(t);
+    Vector_destroy(t);
 }
 
-void trie_print(trie_t* t, size_t level)
+void Trie_print(Trie* t, size_t level)
 {
     size_t i;
     char c;
 
     for (i = 0; i < t->size; ++i)
     {
-        c = (char)vector_at(vector_t, (*t), i).reserved;
+        c = (char)Vector_at((*t), i, Vector).reserved;
 
         if (c == '\0')
         {
-            printf("%*s:%zu\n", (int)level, "", vector_at(vector_t, (*t), i).size);
+            printf("%*s:%zu\n", (int)level, "", Vector_at((*t), i, Vector).size);
         }
         else
         {
             printf("%*s%c\n", (int)level, "", c);
         }
 
-        if (vector_at(vector_t, (*t), i).element != NULL)
+        if (Vector_at((*t), i, Vector).element != NULL)
         {
-            trie_print(&vector_at(vector_t, (*t), i), level + 1);
+            Trie_print(&Vector_at((*t), i, Vector), level + 1);
         }
     }
 }
@@ -120,7 +120,7 @@ void trie_unit_test()
     size_t val;
     static char* dict[] = {"abs", "add", "sub", "mov", "mov32"};
 
-    trie_t t;
+    Trie t;
 
     trie_init(&t);
 

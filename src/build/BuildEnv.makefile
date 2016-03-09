@@ -10,7 +10,8 @@ CXX := g++
 AR  := ar
 LD  := ld
 VALGRIND :=
-DC  := gdc 
+DC  := gdc
+DMD := dmd
 
 DOXYGEN := doxygen
 MARKDOWN := markdown
@@ -26,6 +27,7 @@ CXX         := /tools/local/gcc-5.2.0/bin/g++
 MARKDOWN    := /local_disk/igor/tools/markdown/markdown
 NATURALDOCS := /local_disk/igor/tools/NaturalDocs/NaturalDocs1.51/NaturalDocs
 DOXYGEN     := /tools/local/doxygen-1.8.11/bin/doxygen
+DMD         := /local_disk/igor/tools/dmd/dmd2.068/linux/bin64/dmd
 # include $(SOURCE_DIR)/utm/Mentor.Env.makefile
 
 else ifeq ($(HOSTNAME),smidev1)

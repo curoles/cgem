@@ -31,8 +31,8 @@
  a[b[s]d[d]]s[u[b]]m[o[v[3[2]]]]
 */
 #pragma once
-#ifndef TRIE_H_INCLUDED
-#define TRIE_H_INCLUDED
+#ifndef CGEM_TRIE_H_INCLUDED
+#define CGEM_TRIE_H_INCLUDED
 
 #include <assert.h>
 #include <string.h>
@@ -40,17 +40,17 @@
 
 #include "cgem/c/Vector/vector.h"
 
-typedef vector_t trie_t;
+typedef Vector Trie;
 
-void trie_init(trie_t* t);
+void Trie_init(Trie* t);
 
-void trie_store(trie_t* t, const char* str, size_t val);
+void Trie_store(Trie* t, const char* str, size_t val);
 
-int trie_find(trie_t* t, const char* str, size_t* val);
+int Trie_find(Trie* t, const char* str, size_t* val);
 
-void trie_destroy(trie_t* t);
+void Trie_destroy(Trie* t);
 
-void trie_print(trie_t* t, size_t level);
+void Trie_print(Trie* t, size_t level);
 
 
 #endif
