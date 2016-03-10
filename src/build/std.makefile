@@ -3,6 +3,7 @@ $(eval this_name := $(notdir $(this_dir:%/=%)));
 $(eval sp := $(sp).$(this_name));
 $(eval $(sp)_this_dir := $(this_dir));
 $(eval dirs := $(sort $(dir $(wildcard $(this_dir)/*/Makefile))));
+$(eval dirs += $(sort $(dir $(wildcard $(this_dir)/*/*/Makefile))));
 $(eval $(sp)_mfiles := $(foreach dir,$(dirs),$(dir)/Makefile));
 $(eval $(sp)_targets += $(foreach dir,$(dirs),$(sp).$(notdir $(dir:%/=%))_build));
 $(eval $(sp)_this_rel := $(this_dir:$(SOURCE_DIR)%=%));
