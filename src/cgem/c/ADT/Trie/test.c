@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "cgem/c/Trie/trie.h"
+#include "cgem/c/ADT/Trie/trie.h"
 
 int main()
 {

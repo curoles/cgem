@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define CGEM_VECTOR_UNIT_TEST
-#include "cgem/c/Vector/vector.h"
+#include "cgem/c/ADT/Vector/vector.h"
 
 int main()
 {
