@@ -12,6 +12,7 @@ LD  := $(CC) #better to use GCC that LD, GCC knows how to call LD correctly
 VALGRIND :=
 DC  := gdc
 DMD := dmd
+CLANG := clang
 
 DOXYGEN := doxygen
 MARKDOWN := markdown

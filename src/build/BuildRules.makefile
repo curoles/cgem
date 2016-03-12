@@ -1,6 +1,9 @@
 $(BUILD_DIR)/%.c.o : $(SOURCE_DIR)/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
+ifneq ($(shell which $(CLANG)),)
+	$(CLANG) $(CFLAGS) --analyze $<
+endif
 
 $(BUILD_DIR)/%.c.pic.o : $(SOURCE_DIR)/%.c
 	mkdir -p $(@D)
@@ -9,6 +12,9 @@ $(BUILD_DIR)/%.c.pic.o : $(SOURCE_DIR)/%.c
 $(BUILD_DIR)/%.cpp.o : $(SOURCE_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+ifneq ($(shell which $(CLANG)),)
+	$(CLANG) $(CXXFLAGS) --analyze $<
+endif
 
 $(BUILD_DIR)/%.cpp.pic.o : $(SOURCE_DIR)/%.cpp
 	mkdir -p $(@D)
