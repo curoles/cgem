@@ -3,6 +3,7 @@
 # MAKE_TERMOUT and MAKE_TERMERR. These are set to non-empty values
 # if make believes stdout/stderr is attached to a terminal (rather than a file).
 #
+#//! @cond
 
 ifneq ($(MAKE_TERMOUT),)
 
@@ -89,3 +90,4 @@ define color-str
 "$1$2$(RCol)"
 endef
 
+#//! @endcond

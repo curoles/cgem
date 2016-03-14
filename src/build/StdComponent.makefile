@@ -3,6 +3,7 @@
 # before including this file.
 #
 # See Debugging Makefiles, http://www.oreilly.com/openbook/make3/book/ch12.pdf
+#//! @cond
 
 $(if $(debug_make),$(info Include StdComponent.makefile from $(this_dir)))
 
@@ -19,3 +20,4 @@ $(sp)_build: $($(sp)_targets)
 
 $(call std_epilog)
 
+#//! @endcond

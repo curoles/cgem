@@ -20,6 +20,7 @@ include $(SOURCE_DIR)/doc/component.makefile
 include $(SOURCE_DIR)/src/cgem/c/component.makefile
 include $(SOURCE_DIR)/src/cgem/cpp/component.makefile
 include $(SOURCE_DIR)/src/cgem/d/component.makefile
+include $(SOURCE_DIR)/src/app/component.makefile
 
 .PHONY: clean
 clean:

@@ -42,6 +42,7 @@
 
 typedef Vector Trie;
 
+/// Initialize trie
 void Trie_init(Trie* t);
 
 void Trie_store(Trie* t, const char* str, size_t val);
