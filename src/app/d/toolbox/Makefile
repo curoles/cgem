@@ -15,9 +15,10 @@ sources := $(patsubst %.d,$(this_dir)/%.d,$(sources))
 
 .PHONY: $(sp)_build
 $(sp)_build: APP_EXE_PATH := $($(sp)_this_build)/toolbox
-$(sp)_build: $($(sp)_targets)
+$(sp)_build: LIBS := -lgphobos2 -lz $(BUILD_DIR)/install/d/lib/libdgem.a
+$(sp)_build: $($(sp)_targets) .d_build
 	mkdir -p $(dir $(APP_EXE_PATH))
-	$(DC) $(sources) -I$(SOURCE_DIR)/src/ -o $(APP_EXE_PATH)
+	$(DC) $(sources) -I$(SOURCE_DIR)/src/ -o $(APP_EXE_PATH) $(LIBS)
 	@$(ECHO) $(call color-str,$(BIGre),Done $@: $^)
 
 

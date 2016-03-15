@@ -3,8 +3,16 @@ include $(SOURCE_DIR)/src/build/std.makefile
 
 $(call std_prolog)
 
+
+sources := realnum.d quantity.d length.d time.d temperature.d velocity.d
+#sources := $(patsubst %.d,$(this_dir)/%.d,$(sources))
+objects := $(patsubst %.d,$(this_build)/%.d.o,$(sources))
+
+$(sp)_targets += $(objects)
+
 .PHONY: $(sp)_build
-$(sp)_build:
+$(sp)_build: $($(sp)_targets)
+	@$(ECHO) $(call color-str,$(BIGre),Done $@: $^)
 
 $(call std_epilog)
 

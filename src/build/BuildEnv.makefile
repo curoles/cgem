@@ -18,8 +18,9 @@ DOXYGEN := doxygen
 MARKDOWN := markdown
 NATURALDOCS := NaturalDocs
 
-CFLAGS := -I$(SOURCE_DIR)/src -Werror
+CFLAGS   := -I$(SOURCE_DIR)/src -Werror
 CXXFLAGS := -I$(SOURCE_DIR)/src -std=c++11 -Werror
+DCFLAGS  := -I$(SOURCE_DIR)/src
 
 ifeq ($(HOSTNAME),pc104.smi.local)
 

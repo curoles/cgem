@@ -29,7 +29,7 @@ pure Real ft2m(Real feet) { return feet * 0.3048; }
 
 public struct Length
 {
-    enum quantity = dig.physics.quantity.Length;
+    enum quantity = cgem.d.physics.quantity.Length;
 
 public:
     Real value;
@@ -106,7 +106,7 @@ unittest
 
 public struct Volume
 {
-    enum quantity = dig.physics.quantity.Volume;
+    enum quantity = cgem.d.physics.quantity.Volume;
 
 public:
     Real value;

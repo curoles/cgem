@@ -58,7 +58,7 @@ template generateProp(string name)
 
 public struct Time
 {
-    enum quantity = dig.physics.quantity.Time;
+    enum quantity = cgem.d.physics.quantity.Time;
 
 public:
     Real value;
