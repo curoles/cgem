@@ -23,7 +23,7 @@
 
 #include <iterator>
 
-namespace gem {
+namespace cgem {
 
 template<typename value_t>
 class range_impl
@@ -127,4 +127,4 @@ range_impl<T> range(T end){
     return range_impl<T>(0, end, 1);
 }
 
-} // namespace gem
+} // namespace cgem

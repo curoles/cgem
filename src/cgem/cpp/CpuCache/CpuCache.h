@@ -6,6 +6,30 @@
  *  License:   Distributed under the Boost Software License, Version 1.0.
  *            (See http://www.boost.org/LICENSE_1_0.txt)
  *
+ * @page page_CPU_cache CPU Cache
+ *
+ * @section section_Cache_structure Cache structure
+ * <table> <caption>Cache structure</caption>
+ * <tr><th><th>Way 0<th> Way 1<th>...<th>Way N
+ * <tr><td>Set 0<td>entry<td>entry<td>entry<td>entry
+ * <tr><td>Set 1<td>entry<td>entry<td>entry<td>entry
+ * <tr><td>...
+ * <tr><td>Set M<td>entry<td>entry<td>entry<td>entry
+ * </table>
+ *
+ * Cache entry usually has the following structure:
+ * <table>
+ * <tr><td>Tag<td>Data Block<td>Flag bits
+ * </table>
+ * The <em>Data Block</em> (cache line) contains the actual data
+ * fetched from the main memory.
+ * The <em>Tag</em> contains part of the address of the actual data fetched
+ * from the main memory.
+ *
+ * An effective memory address is split (MSB to LSB) into the tag,
+ * the index and the block offset.
+ * The index describes which cache row/set that the data has been put in.
+ * The index length is log_2(r) bits for r cache rows.
  */
 #pragma once
 
@@ -13,17 +37,66 @@
 #include <tuple>
 #include <functional>
 
-namespace gem { namespace cpu {
+/** cgem*/namespace cgem { /** cpu*/namespace cpu {
 
-constexpr size_t bit2byte(size_t bits) {return (bits+7)/8;}
-constexpr size_t bit2word(size_t bits, size_t wsz) {return (bit2byte(bits)+(wsz-1))/wsz;}
+/// Get number of bytes to hold given number of bits.
+///
+constexpr size_t bit2byte(
+    size_t bits ///< number of bits
+)
+{
+    return (bits+7)/8;
+}
 
+constexpr bool unit_test_bit2byte(){
+    static_assert (bit2byte(8) == 1, "8 bits = 1 byte");
+    static_assert (bit2byte(15) == 2, "15 bits = 2 bytes");
+    return true;
+}
+
+/// Get number of words to hold given number of bits.
+///
+constexpr size_t bit2word(
+    size_t bits, ///< number of bits
+    size_t wsz   ///< word size
+) {
+    return (bit2byte(bits)+(wsz-1))/wsz;
+}
+
+constexpr bool unit_test_bit2word(){
+    static_assert (
+        bit2word(64, sizeof(uint32_t)) == 2, "64 bits = 2 32bit words"
+    );
+    return true;
+}
+
+/// Compile Time logarithm.
+///
 constexpr unsigned Log2(unsigned n, unsigned p = 0) {
     return (n <= 1) ? p : Log2(n / 2, p + 1);
 }
 
-constexpr unsigned makeBitMask(unsigned pos) {
+constexpr bool unit_test_Log2(){
+    static_assert (
+        Log2(64) == 6, "1,2,4,8,16,32,64; 2^6=64"
+    );
+    return true;
+}
+
+/// Compile Time bit mask generation, MSB pos 2 => 0b111.
+///
+constexpr unsigned makeBitMask(
+    unsigned pos ///< MSBit position
+)
+{
     return (pos == 0) ? 0x1 : ((0x1 << pos) | makeBitMask(pos - 1));
+}
+
+constexpr bool unit_test_makeBitMask(){
+    static_assert (makeBitMask(0) == 0b1, "b1");
+    static_assert (makeBitMask(1) == 0b11, "b11");
+    static_assert (makeBitMask(9) == 0b1111111111, "b1111111111");
+    return true;
 }
 
 template<class TCache>
@@ -36,7 +109,7 @@ size_t defaultCacheEvictionPolicy(const TCache& cache, size_t setId)
     return 0;
 }
 
-/** CPU cache.
+/** SW model of HW/RTL CPU cache.
  *
  * Entry structure: tag + data_block + flag_bits
  * Address split: tag + index + block_offset
@@ -207,13 +280,11 @@ public:
 };
 
 
-}} // end of gem::cpu
+}} // end of cgem::cpu
 
 
 #ifdef GEM_CPU_CACHE_TEST
 
-//gcc CpuCache.cpp -o CpuCache.out --std=c++11 -lstdc++
-///tools/local/gcc-4.8.2/bin/gcc-4.8.2 test.cpp -o test.out --std=c++11 -lstdc++ -static-libgcc -Wl,-rpath=/tools/local/gcc-4.8.2/lib64/
 
 #include <cassert>
 #include <stdexcept>
@@ -221,7 +292,7 @@ public:
 
 int test()
 {
-    const uint32_t tmp = gem::cpu::makeBitMask(4);
+    const uint32_t tmp = cgem::cpu::makeBitMask(4);
     //std::cout << std::hex << "0x" << tmp << "\n";
     static_assert(tmp == 0x1F, "");
 
@@ -231,7 +302,16 @@ int test()
     const size_t kDataSize {64};
     const size_t kFlagsSize {1};
 
-    using Cache = gem::cpu::Cache<uint64_t,uint32_t,kNumberLines,kNumberWays,kTagSize,kDataSize,kFlagsSize>;
+    using Cache =
+        cgem::cpu::Cache<
+            uint64_t,     // 64 bit address
+            uint32_t,     // 32 bit word
+            kNumberLines,
+            kNumberWays,
+            kTagSize,
+            kDataSize,
+            kFlagsSize
+        >;
 
     static_assert(Cache::Line::Tag::sizeBits == kTagSize, "tag size");
     static_assert(Cache::Line::Data::sizeBits == kDataSize, "data size");

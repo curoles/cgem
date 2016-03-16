@@ -4,7 +4,7 @@
 #include "Range.h"
 
 using namespace std;
-using namespace gem;
+using namespace cgem;
 
 int main()
 {
