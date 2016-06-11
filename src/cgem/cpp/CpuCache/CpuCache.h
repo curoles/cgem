@@ -28,6 +28,8 @@
  *
  * An effective memory address is split (MSB to LSB) into the tag,
  * the index and the block offset.
+ * <table><tr><td>tag<td>index<td>block offset</table>
+ *
  * The index describes which cache row/set that the data has been put in.
  * The index length is log_2(r) bits for r cache rows.
  */
