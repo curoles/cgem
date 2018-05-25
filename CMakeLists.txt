@@ -20,8 +20,12 @@ set (CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 # CGEM depends on...
 #include(${CMAKE_CURRENT_SOURCE_DIR}/external_packages.cmake)
 
-add_subdirectory (src/c)
-add_subdirectory (src/cpp)
+# Because we have many headers that do not belong to any target
+# and therefore can't use target_include_directories.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_subdirectory (src/cgem)
+add_subdirectory (src/cgm)
 
 enable_testing()
 find_package(GTest REQUIRED)
