@@ -5,7 +5,7 @@
  * This implementation uses C/C++ extention called Variable-length Automatic Arrays.
  * [GNU VLA](https://gcc.gnu.org/onlinedocs/gcc/Variable-Length.html)
  *
- * If VLA is not available, `stack_array` will use dynamic memory allocation
+ * If VLA is not available, stack_array will use dynamic memory allocation
  * with std::unique_ptr.
  *
  * Even crude experiment using `time a.out`  with allocating significant chunk
@@ -13,6 +13,8 @@
  * VLA is faster than dynamic memory allocation.
  *
  *
+ * @example stack_array/test_stack_array.cpp
+ * Test cases provide good example of how to use stack_array.
  */
 #pragma once
 #ifndef CGM_STACK_ARRAY_H_INCLUDED
@@ -51,6 +53,14 @@ public:
         return ptr_[n];
     }
 
+    /// Get an element.
+    ///
+    /// @test
+    /// @code
+    ///      stack_array(int,10,a);
+    ///      int x = a[3];
+    /// @endcode
+    ///
     const T& operator[](std::size_t n) const {
         assert(n < size_);
         return ptr_[n];
@@ -75,7 +85,8 @@ public:
     std::unique_ptr<T[]> name##_unqptr_ = std::make_unique<T[]>(size); \
     cgm::raw_ptr_array<T> name(size, name##_unqptr_.get());
 
-/// Macro that hides...
+/// Macro stack_array hides Variable Length Automatic Array and instead
+/// exposes managing object.
 ///
 #if defined(__GNUC__)
     #pragma Using Variable-length Automatic Arrays for stack_array

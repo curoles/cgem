@@ -9,6 +9,8 @@
 
 /// Test creation of stack_array
 ///
+/// @test
+///
 TEST (StackArray, Creation) {
     int sz{10};
     stack_array(int, sz, a);
@@ -18,6 +20,8 @@ TEST (StackArray, Creation) {
 
 /// Test operator[]
 ///
+/// @test
+///
 TEST (StackArray, SetGetElement) {
     stack_array(int, 10, a);
     a[3] = 3;
@@ -26,6 +30,7 @@ TEST (StackArray, SetGetElement) {
 
 /// Test version make_unique<T[]>(size)
 ///
+/// @test
 TEST (StackArray, DynamicMemoryAllocation) {
     CGM_STACK_ARRAY_UPTR(unsigned long, 10, a);
     ASSERT_EQ (a.size(), 10) << "Size must be 10";
@@ -35,6 +40,8 @@ TEST (StackArray, DynamicMemoryAllocation) {
 }
 
 /// Test iterators work with numeric algorithms and range `for`.
+///
+/// @test
 ///
 TEST (StackArray, Iterators) {
     int sz{10};
