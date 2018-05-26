@@ -10,8 +10,9 @@
 /// Test creation of stack_array
 ///
 TEST (StackArray, Creation) {
-    stack_array(int, 10, a);
-    ASSERT_EQ (a.size(), 10) << "Size must be 10";
+    int sz{10};
+    stack_array(int, sz, a);
+    ASSERT_EQ (a.size(), sz) << "Size must be 10";
     ASSERT_NE (a.data(), nullptr) << "Data not null";
 }
 
@@ -36,7 +37,8 @@ TEST (StackArray, DynamicMemoryAllocation) {
 /// Test iterators work with numeric algorithms and range `for`.
 ///
 TEST (StackArray, Iterators) {
-    stack_array(int, 10, a);
+    int sz{10};
+    stack_array(int, sz, a);
     std::fill(a.begin(), a.end(), 3);
     ASSERT_EQ (a[8], 3);
     std::iota(a.begin(), a.end(), -4);

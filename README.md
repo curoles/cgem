@@ -11,7 +11,8 @@ If compiler does not support VLAA, then dynamic memory allocation is used.
 
 ```cpp
 TEST (StackArray, Iterators) {
-    stack_array(int, 10, a);
+    int sz{10};
+    stack_array(int, sz, a);
     a[0] = 0; a[1] = 1; a[2] = a[1];
     std::fill(a.begin(), a.end(), 3);
     std::iota(a.begin(), a.end(), -4);
