@@ -15,8 +15,8 @@
  *
  */
 #pragma once
-#ifndef CGM_STACK_ARRAY_INCLUDED
-#define CGM_STACK_ARRAY_INCLUDED
+#ifndef CGM_STACK_ARRAY_H_INCLUDED
+#define CGM_STACK_ARRAY_H_INCLUDED
 
 #include <cstddef> // size_t
 #include <cassert> // assert
@@ -65,7 +65,8 @@ public:
 };
 
  
-
+/// Create 2 objects: 1) array `T p[n]` and 2) `raw_ptr_array<T[]> a(p)`. 
+///
 #define CGM_STACK_ARRAY_VLA(T,size,name) \
     T name##_vla_[size]; \
     cgm::raw_ptr_array<T> name(size, name##_vla_);
@@ -74,6 +75,8 @@ public:
     std::unique_ptr<T[]> name##_unqptr_ = std::make_unique<T[]>(size); \
     cgm::raw_ptr_array<T> name(size, name##_unqptr_.get());
 
+/// Macro that hides...
+///
 #if defined(__GNUC__)
     #pragma Using Variable-length Automatic Arrays for stack_array
     #define stack_array(T,size,name) CGM_STACK_ARRAY_VLA(T,size,name)
