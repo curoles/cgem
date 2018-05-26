@@ -6,7 +6,10 @@ cmake_minimum_required (VERSION 3.10)
 # CMakeLists files in this project can refer to the root source directory
 # of the project as ${CGEM_SOURCE_DIR} and
 # to the root binary directory of the project as ${CGEM_BINARY_DIR}.
-project (CGEM)
+project (CGEM
+    VERSION 3.0
+    LANGUAGES C CXX
+)
 
 # Use C++17
 #https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
