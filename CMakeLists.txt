@@ -31,5 +31,7 @@ enable_testing()
 find_package(GTest REQUIRED)
 add_subdirectory (test)
 
+include(doc.cmake)
+
 # at the end show the settings and tools
 include (${CMAKE_CURRENT_SOURCE_DIR}/log_variables.cmake)

@@ -12,6 +12,8 @@ namespace cgm {
 
 enum class StackDir : int { Up = 1, Down = -1};
 
+/// Find stack direction
+///
 inline
 auto stack_direction() -> StackDir {
     return (cgm__stack_direction() < 0)? StackDir::Down : StackDir::Up;
