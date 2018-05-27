@@ -1,5 +1,5 @@
 add_executable (test_stack_direction
-    main.cpp
+    test_stack_direction.cpp
 )
 
 target_link_libraries(test_stack_direction

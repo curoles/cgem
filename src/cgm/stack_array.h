@@ -89,7 +89,7 @@ public:
 /// exposes managing object.
 ///
 #if defined(__GNUC__)
-    #pragma Using Variable-length Automatic Arrays for stack_array
+    #pragma message "Using Variable-length Automatic Arrays for stack_array"
     #define stack_array(T,size,name) CGM_STACK_ARRAY_VLA(T,size,name)
 #else
     #define stack_array(T,size,name) CGM_STACK_ARRAY_UPTR(T,size,name)

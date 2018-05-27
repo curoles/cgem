@@ -9,4 +9,5 @@ include(GoogleTest)
 
 add_subdirectory (stack_direction)
 add_subdirectory (stack_array)
-
+add_subdirectory (ct_math)
+add_subdirectory (numrange)
