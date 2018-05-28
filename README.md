@@ -23,3 +23,16 @@ TEST (StackArray, Iterators) {
     ASSERT_EQ(sum, std::accumulate(a.begin(), a.end(), 0));
 }
 ```
+
+## Numeric range for C++11 range-based for loop
+
+```cpp
+  for (auto i : num::range(5)) { // [0,5) = 0, 1, 2, 3, 4; the same as range(0, 5)
+
+  for (auto i : num::range(5, 16, 3)) { // 5, 8, 11, 14; with step
+
+  for (auto f : num::range(5.1, 8.3, 0.6)) { // with floating-point numbers
+
+  for (auto i : num::range(16, 5, -3)) { // 16, 13, 10, 7; reversed
+```
+
