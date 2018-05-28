@@ -29,5 +29,18 @@ constexpr unsigned int factorial(T i)
          i * factorial(i - 1u); // recursive definition
 }
 
+
+/// Compile Time logarithm.
+///
+template<typename T>
+// where T is numeric
+constexpr T log2(T n, T p = 0) {
+    return (n <= 1) ? p : log2(n / 2, p + 1);
+}
+
+constexpr void unit_test_log2() {
+    static_assert (log2(64) == 6, "1,2,4,8,16,32,64; 2^6=64");
+}
+
 } // cgm::ct::math
 #endif
