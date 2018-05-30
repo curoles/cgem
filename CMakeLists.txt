@@ -29,12 +29,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory (src/cgem)
 add_subdirectory (src/cgm)
+add_subdirectory (doc)
 
 enable_testing()
 find_package(GTest REQUIRED)
 add_subdirectory (test)
 
-include(doc.cmake)
-
-# at the end show the settings and tools
-include (${CMAKE_CURRENT_SOURCE_DIR}/log_variables.cmake)
+# Show important variables
+MESSAGE( STATUS "CMAKE_C_COMPILER:     " ${CMAKE_C_COMPILER} )
+MESSAGE( STATUS "CMAKE_CXX_COMPILER:   " ${CMAKE_CXX_COMPILER} )
+MESSAGE( STATUS "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX} )

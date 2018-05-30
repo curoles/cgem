@@ -6,9 +6,10 @@
  *  License:   Distributed under the Boost Software License, Version 1.0.
  *            (See http://www.boost.org/LICENSE_1_0.txt)
  *
- * @page page_CPU_cache CPU Cache
+ * CPU Cache
+ * =========
  *
- * @section section_Cache_structure Cache structure
+ * Cache structure
  *
  * |     | Way 0 | Way 1 | Way 2 | ... | Way N |
  * | --- | ----- | ----- | ----- | --- | ----- |
@@ -24,9 +25,9 @@
  * | --- | ---------- | --------- |
  * |     |            |           |
  * 
- * The <em>Data Block</em> (cache line) contains the actual data
+ * The *Data Block* (cache line) contains the actual data
  * fetched from the main memory.
- * The <em>Tag</em> contains part of the address of the actual data fetched
+ * The *Tag* contains part of the address of the actual data fetched
  * from the main memory.
  *
  * An effective memory address is split (MSB to LSB) into the tag,
@@ -55,15 +56,91 @@ namespace cgm::model::cpu {
 
 using namespace cgm::ct;
 
+namespace cache {
+
+/// For certain Set, find available Way or make one available by eviction.
+///
 template<class TCache>
-size_t defaultCacheEvictionPolicy(const TCache& cache, size_t setId)
+size_t simpleEvictionPolicy(const TCache& cache, size_t setId)
 {
-    for (auto wayId : num::range(TCache::numberWays)) {
+    for (auto wayId : num::range(cache.numWays())) {
         auto line = cache.getLine(setId, wayId); 
         if (not line.isValid()) return wayId;
     }
-    return 0;
+    return 0; // All ways are taken, use first one then.
 }
+
+template<typename T>
+struct Tag
+{
+    const size_t size; // bits
+    T val;
+    using value_type = T;
+};
+
+template<typename T>
+struct Flags
+{
+    const size_t size; // bits
+    T val;
+    using value_type = T;
+
+    T bitAt(size_t pos) const {return bits::at(val,pos);}
+    void setBit(size_t pos) {val = bits::set(val,pos);}
+    void clearBit(size_t pos) {val = bits::clear(val,pos);}
+};
+
+/// Hand-made alternative to std::bitset, has no length limitation,
+/// has by word access.
+///
+template<size_t sizeBits, typename TWord>
+using WordArray = std::array<TWord, bits::words(sizeBits,sizeof(TWord))>;
+
+template<size_t sizeBits, typename TWord>
+struct Data : public WordArray<sizeBits, TWord>
+{
+    static constexpr size_t sizeBytes = bits::bytes(sizeBits);
+    static constexpr size_t sizeBits_ = sizeBits;
+    static constexpr size_t sizeWords = bits::words(sizeBits,sizeof(TWord));
+    static constexpr size_t addrBits = cgm::ct::math::log2(sizeBytes);
+
+    TWord& wordAtBit(size_t pos) {
+        return WordArray<sizeBits,TWord>::at(bits::words(pos,sizeof(TWord)));
+    }
+
+    TWord bitAt(size_t pos) const {return bits::at(wordAtBit(pos),pos);}
+    void setBit(size_t pos)   {wordAtBit(pos) |=  bits::one<TWord>(pos);}
+    void clearBit(size_t pos) {wordAtBit(pos) &= ~bits::one<TWord>(pos);}
+};
+
+template<typename TAddr, typename TWord,
+         size_t kTagSize, size_t kDataSize,
+         size_t kFlagsSize, size_t kLineValidBit>
+struct Line
+{
+    static constexpr size_t sizeBits = kTagSize + kDataSize + kFlagsSize;
+
+    using Tag = cache::Tag<typename bits::Bytes<bits::bytes(kTagSize)>::type>;
+    Tag tag{kTagSize,0};
+
+    using Data = cache::Data<kDataSize,TWord>;
+    Data data;
+
+    using Flags = cache::Flags<typename bits::Bytes<bits::bytes(kFlagsSize)>::type>;
+    Flags flags{kFlagsSize,0};
+
+    bool isValid() const { return !!flags.bitAt(kLineValidBit); }
+    void setValid()   { flags.setBit(kLineValidBit); }
+    void clearValid() { flags.clearBit(kLineValidBit); }
+    void invalidate() { clearValid(); }
+
+    static constexpr TAddr dataAddrMask = bits::make1s(Data::addrBits - 1);
+
+    static size_t getByteId(TAddr addr) { return addr & dataAddrMask; }
+    static size_t getWordId(TAddr addr) { return getAddrByteId(addr)/sizeof(TWord); }
+};
+
+} // namespace cache
 
 /** SW model of HW/RTL CPU cache.
  *
@@ -73,8 +150,6 @@ size_t defaultCacheEvictionPolicy(const TCache& cache, size_t setId)
 template<
     typename TAddr,          ///< address type, uint64_t is ok
     typename TWord,          ///< word type defines word size, from uint8_t to uint64_t
-    size_t kNumberLines,     ///< number of cache lines
-    size_t kNumberWays,      ///< number of ways or associativity
     size_t kTagSize,         ///< size of Tag bits in cache line
     size_t kDataSize,        ///< size of Data bits in cache line
     size_t kFlagsSize   = 1, ///< size of flags/info bits, at least 1 for Valid bit
@@ -85,46 +160,58 @@ class Cache
 public:
     typedef TAddr Addr;
     typedef TWord Word;
-    static const size_t numberLines {kNumberLines};
-    static const size_t numberWays {kNumberWays};
+    using Line = cache::Line<TAddr, TWord, kTagSize, kDataSize, kFlagsSize, kLineValidBit>;
+    using Lines = std::vector<Line>;
+    using EvictionPolicy = std::function<size_t(const Cache&,size_t)>;
+public:
+    const size_t numberLines;
+    const size_t numberWays;
+    const size_t indexAddrBits;
+    const size_t allAddrBits;
+    static constexpr TAddr dataAddrMask = bits::make1s(Line::Data::addrBits - 1);
+    const  TAddr indexAddrMask;
+    static constexpr TAddr tagAddrMask = bits::make1s(Line::Tag::sizeBits - 1);
+private:
 
-    template<size_t sizeBits>
-    using WordArray = std::array<Word, bits::words(sizeBits,sizeof(Word))>;
+    size_t hitCount, missCount;
+    EvictionPolicy evictionPolicy;
+    Lines lines;
 
-    struct Line
+public:
+    Cache(const Cache& ) = delete;
+    Cache(const Cache&& ) = delete;
+    Cache(
+        size_t numberLines,     ///< number of cache lines
+        size_t numberWays,      ///< number of ways or associativity
+        EvictionPolicy policy = cpu::cache::simpleEvictionPolicy<Cache>
+    ):
+        numberLines(numberLines), numberWays(numberWays),
+        indexAddrBits(cgm::ct::math::log2(numberLines)),
+        allAddrBits(Line::Data::addrBits + kTagSize + indexAddrBits),
+        indexAddrMask(bits::make1s(indexAddrBits - 1)),
+        hitCount(0), missCount(0), evictionPolicy(policy),
+        lines(numberLines*numberWays)
+    {
+        static_assert((sizeof(typename Line::Tag::value_type)/8) <= kTagSize);
+        static_assert((sizeof(typename Line::Flags::value_type)/8) <= kFlagsSize);
+        static_assert(kDataSize % sizeof(Word) == 0, "data size word aligned");
+    }
+
+    size_t numWays() const { return numberWays; }
+    size_t numLines() const { return numberLines; }
+
+    /*struct Line
     {
         static const size_t sizeBits = kTagSize + kDataSize + kFlagsSize;
 
-        struct Tag
-        {
-            static const size_t sizeBits = kTagSize;
-            typedef uint64_t ValType;
-            ValType val;
-        } tag;
+        using Tag = cache::Tag<uint64_t>;
+        Tag tag{kTagSize,0};
 
-        struct Data : public WordArray<kDataSize>
-        {
-            static const size_t sizeBits = kDataSize;
-            static const size_t sizeBytes = bits::bytes(sizeBits);
-            static const size_t sizeWords = bits::words(sizeBits,sizeof(Word));
-            static const size_t addrBits = cgm::ct::math::log2(sizeBytes);
+        using Data = cache::Data<kDataSize,TWord>;
+        Data data;
 
-            constexpr Word bitN(size_t n) {return 1u << n;}
-            bool bitAt(size_t n) const {return WordArray<kDataSize>::at(bits::words(n,sizeof(Word))) & bitN(n);}
-            void setBit(size_t n) {WordArray<kDataSize>::at(bits::words(n,sizeof(Word))) |= bitN(n);}
-            void clearBit(size_t n) {WordArray<kDataSize>::at(bits::words(n,sizeof(Word))) &= ~bitN(n);}
-        } data;
-
-        struct Flags
-        {
-            static const size_t sizeBits = kFlagsSize;
-            typedef uint64_t ValType;
-            ValType val;
-            constexpr ValType bitN(size_t n) {return 1lu << n;}
-            bool bitAt(size_t n) const {return val & bitN(n);}
-            void setBit(size_t n) {val |= bitN(n);}
-            void clearBit(size_t n) {val &= ~bitN(n);}
-        } flags;
+        using Flags = cache::Flags<uint64_t>;
+        Flags flags{kFlagsSize,0};
 
         bool isValid() const {return flags.bitAt(kLineValidBit);}
         void setValid() {flags.setBit(kLineValidBit);}
@@ -132,7 +219,7 @@ public:
         void invalidate() {clearValid();}
 
         static
-        typename Tag::ValType getAddrTag(Addr addr) {
+        typename Tag::value_type getAddrTag(Addr addr) {
             return (addr >> (Data::addrBits + indexAddrBits)) & tagAddrMask;
         }
 
@@ -143,36 +230,14 @@ public:
             return getAddrTag(addr) == tag.val;
         }
 
-    };
+    };*/
 
-    static const size_t indexAddrBits = cgm::ct::math::log2(kNumberLines);
-    static const size_t addrBits = Line::Data::addrBits + Line::Tag::sizeBits + indexAddrBits;
+    //static const size_t indexAddrBits = cgm::ct::math::log2(kNumberLines);
+    //static const size_t addrBits = Line::Data::addrBits + Line::Tag::sizeBits + indexAddrBits;
 
-    static const unsigned dataAddrMask = bits::make1s(Line::Data::addrBits - 1);
-    static const unsigned indexAddrMask = bits::make1s(indexAddrBits - 1);
-    static const unsigned tagAddrMask = bits::make1s(Line::Tag::sizeBits - 1);
-
-
-    using Lines = std::array<Line,kNumberLines * kNumberWays>;
-
-    Lines lines;
-
-    size_t hitCount, missCount;
-
-    using EvictionPolicy = std::function<size_t(const Cache&,size_t)>;
-
-    EvictionPolicy evictionPolicy;
-
-public:
-    Cache(const Cache& ) = delete;
-    Cache(const Cache&& ) = delete;
-    Cache(EvictionPolicy policy = cpu::defaultCacheEvictionPolicy<Cache>):
-        hitCount(0), missCount(0), evictionPolicy(policy)
-    {
-        static_assert((sizeof(typename Line::Tag::ValType)/8) <= kTagSize, "tag size more than max");
-        static_assert((sizeof(typename Line::Flags::ValType)/8) <= kFlagsSize, "flags size more than max");
-        static_assert(kDataSize % sizeof(Word) == 0, "data size word aligned");
-    }
+    //static const unsigned dataAddrMask = bits::make1s(Line::Data::addrBits - 1);
+    //static const unsigned indexAddrMask = bits::make1s(indexAddrBits - 1);
+    //static const unsigned tagAddrMask = bits::make1s(Line::Tag::sizeBits - 1);
 
     void invalidateAll() {
         for (auto& line : lines) {
@@ -181,11 +246,11 @@ public:
     }
 
     Line& getLine(size_t setId, size_t wayId) {
-        return lines.at(kNumberWays*setId + wayId);
+        return lines.at(numberWays*setId + wayId);
     }
 
     const Line& getLine(size_t setId, size_t wayId) const {
-        return lines.at(kNumberWays*setId + wayId);
+        return lines.at(numberWays*setId + wayId);
     }
 
     size_t getLineIndexByAddr(Addr addr) {
@@ -208,9 +273,9 @@ public:
 
     std::tuple<bool,size_t,size_t,size_t> findLine(Addr addr) {
         bool hit {false};
-        size_t setId{getLineIndexByAddr(addr)}, wayId{777}, wordId{Line::getAddrWordId(addr)};
+        size_t setId{getLineIndexByAddr(addr)}, wayId{0}, wordId{Line::getAddrWordId(addr)};
 
-        for (wayId = 0; wayId < kNumberWays; ++wayId) {
+        for (wayId = 0; wayId < numberWays; ++wayId) {
             Line& line = getLine(setId, wayId);
             if (line.isValid() and line.isAddrTagMatch(addr)) {
                 hit = true;

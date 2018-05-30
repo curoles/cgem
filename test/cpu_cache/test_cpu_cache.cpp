@@ -6,7 +6,63 @@
 #include "gtest/gtest.h"
 #include "cgm/model/cpu_cache.h"
 
+constexpr size_t kNumberLines {16};
+constexpr size_t kNumberWays   {2};
+constexpr size_t kTagSize      {2};
+constexpr size_t kDataSize    {64};
+constexpr size_t kFlagsSize    {1};
 
+using Cache =
+    cgm::model::cpu::Cache<
+        uint64_t,     // 64 bit address
+        uint32_t,     // 32 bit data word
+        kTagSize,
+        kDataSize,
+        kFlagsSize
+    >;
+
+TEST(CpuCache, Creation) {
+    Cache cache{kNumberLines, kNumberWays};
+
+    cache.invalidateAll();
+
+    ASSERT_EQ (cache.numLines(), kNumberLines);
+    ASSERT_EQ (cache.numWays(), kNumberWays);
+
+    ASSERT_EQ (cache.getLine(0,0).tag.size, kTagSize);
+    ASSERT_EQ (cache.getLine(1,1).data.size(), kDataSize/32);
+    ASSERT_EQ (Cache::Line::Data::sizeBits_, kDataSize);
+    ASSERT_EQ (Cache::Line::Data::sizeBytes, kDataSize/8);
+    ASSERT_EQ (Cache::Line::Data::sizeWords, kDataSize/(8*sizeof(Cache::Word)));
+    ASSERT_EQ (Cache::Line::Data::addrBits, 3/*64/8=8=2^3*/);
+    ASSERT_EQ (cache.getLine(2,0).flags.size, kFlagsSize);
+
+    //std::cout << std::dec << "total # of addr bits:" << cache.addrBits << "\n";
+    //std::cout << std::dec << "# of data addr bits:" << Cache::Line::Data::addrBits << "\n";
+    //std::cout << std::dec << "# of index addr bits:" << Cache::indexAddrBits << "\n";
+
+    ASSERT_EQ (cache.indexAddrBits, 4/*log2(16)*/);
+    ASSERT_EQ (cache.allAddrBits, 2+4+3);
+}
+
+TEST(CpuCache, Bounds) {
+    Cache cache{kNumberLines, kNumberWays};
+
+    bool hadException {false};
+    try {
+        cache.getLine(kNumberLines,0);
+    } catch(std::out_of_range& e) {
+        hadException = true;
+    }
+    ASSERT_TRUE (hadException);
+}
+
+TEST(CpuCache, InsertLine) {
+    Cache cache{kNumberLines, kNumberWays};
+
+    cache.invalidateAll();
+
+}
 
 #if 0
 
@@ -17,50 +73,6 @@
 
 int test()
 {
-    const uint32_t tmp = cgem::cpu::makeBitMask(4);
-    //std::cout << std::hex << "0x" << tmp << "\n";
-    static_assert(tmp == 0x1F, "");
-
-    const size_t kNumberLines {16};
-    const size_t kNumberWays {2};
-    const size_t kTagSize {2};
-    const size_t kDataSize {64};
-    const size_t kFlagsSize {1};
-
-    using Cache =
-        cgem::cpu::Cache<
-            uint64_t,     // 64 bit address
-            uint32_t,     // 32 bit word
-            kNumberLines,
-            kNumberWays,
-            kTagSize,
-            kDataSize,
-            kFlagsSize
-        >;
-
-    static_assert(Cache::Line::Tag::sizeBits == kTagSize, "tag size");
-    static_assert(Cache::Line::Data::sizeBits == kDataSize, "data size");
-    static_assert(Cache::Line::Data::sizeBytes == kDataSize/8, "data size");
-    static_assert(Cache::Line::Data::sizeWords == kDataSize/(8*sizeof(Cache::Word)), "data size");
-    static_assert(Cache::Line::Data::addrBits == 3, "addr bits");
-    static_assert(Cache::Line::Flags::sizeBits == kFlagsSize, "flag size");
-
-    Cache cache;
-    assert(cache.numberLines == kNumberLines);
-    static_assert(Cache::numberLines == kNumberLines, "# lines");
-    assert(cache.numberWays == kNumberWays);
-    static_assert(Cache::numberWays == kNumberWays, "# ways");
-
-    cache.invalidateAll();
-
-    bool hadException {false};
-    try {cache.getLine(kNumberLines,0);}catch(std::out_of_range& e){hadException=true;}
-    assert(hadException);
-
-    std::cout << std::dec << "total # of addr bits:" << cache.addrBits << "\n";
-    std::cout << std::dec << "# of data addr bits:" << Cache::Line::Data::addrBits << "\n";
-    std::cout << std::dec << "# of index addr bits:" << Cache::indexAddrBits << "\n";
-
     size_t setId, wayId, wordId;
     Cache::Line line {{0xdead},{},{0xdead}};
 
